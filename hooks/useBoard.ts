@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { Tables } from "~/utils/database.types";
 
 export enum Cell {
   Empty,
@@ -17,25 +18,11 @@ export enum Cell {
 export type Orientation = "vertical" | "horizontal";
 export type BoardState = ReturnType<typeof useBoard>;
 
-export function useBoard(width: number, height: number, players: number) {
-  // Create a width x height 2d array of uninitialized boxes
-  const [boxes, setBoxes] = useState(createGrid(width, height, Cell.Empty));
-
-  const [verticals, setVerticals] = useState(
-    createGrid(width + 1, height, Cell.Empty)
-  );
-
-  const [horizontals, setHorizontals] = useState(
-    createGrid(width, height + 1, Cell.Empty)
-  );
-
-  const [turn, setTurn] = useState(1);
-
-  useEffect(() => {
-    setBoxes(createGrid(width, height, Cell.Empty));
-    setVerticals(createGrid(width + 1, height, Cell.Empty));
-    setHorizontals(createGrid(width, height + 1, Cell.Empty));
-  }, [width, height]);
+export function useBoard(
+  room: Tables<"rooms">,
+  setRoom: (room: Tables<"rooms">) => void
+) {
+  const { players, horizontals, verticals, boxes, turn } = room;
 
   function isBoxComplete(x: number, y: number) {
     const top = horizontals[y]?.[x];
@@ -95,12 +82,13 @@ export function useBoard(width: number, height: number, players: number) {
   }
 
   const scores = useMemo(() => {
-    const score = Array.from({ length: players }, () => 0);
+    const score = new Map();
 
     for (const row of boxes) {
       for (const box of row) {
         if (box !== Cell.Empty) {
-          score[box - 1]++;
+          const player = players[box - 1];
+          score.set(player, score.get(player) + 1 || 1);
         }
       }
     }
@@ -109,18 +97,11 @@ export function useBoard(width: number, height: number, players: number) {
   }, [boxes, players]);
 
   return {
-    boxes,
-    verticals,
-    horizontals,
-    setLine,
-    width,
-    height,
     scores,
-    turn,
   };
 }
 
-function createGrid<T>(width: number, height: number, value: T) {
+export function createGrid<T>(width: number, height: number, value: T) {
   return Array.from({ length: height }, () =>
     Array.from({ length: width }, () => value)
   );
