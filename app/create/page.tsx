@@ -5,6 +5,8 @@ import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
 import { supabase } from "~/utils/supabase";
 import { z } from "zod";
+import { Button } from "~/components/Button";
+import { Form } from "~/components/Form";
 
 const CreateSchema = z.object({
   username: z.string().min(1).max(16),
@@ -17,7 +19,7 @@ export default function CreatePage() {
   const router = useRouter();
 
   return (
-    <form
+    <Form
       onSubmit={async (event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -28,18 +30,19 @@ export default function CreatePage() {
         localStorage.setItem("player", data.player);
         router.push(`/room/${data.id}`);
       }}
-      className="flex flex-col gap-4 p-4"
     >
-      <Label htmlFor="username">Username</Label>
-      <Input
-        type="text"
-        name="username"
-        id="username"
-        placeholder="Name"
-        required
-        minLength={1}
-        maxLength={16}
-      />
+      <div className="w-full">
+        <Label htmlFor="username">Username</Label>
+        <Input
+          type="text"
+          name="username"
+          id="username"
+          placeholder="Pineapple"
+          required
+          minLength={1}
+          maxLength={16}
+        />
+      </div>
       <div className="flex flex-row gap-4 w-full">
         <div className="w-full">
           <Label htmlFor="roomName">Room Name</Label>
@@ -47,13 +50,13 @@ export default function CreatePage() {
             type="text"
             name="roomName"
             id="roomName"
-            placeholder="Room Name"
+            placeholder="Strawberry"
             required
             minLength={1}
             maxLength={32}
           />
         </div>
-        <div>
+        <div className="w-fit">
           <Label htmlFor="width">Width</Label>
           <Input
             type="number"
@@ -61,7 +64,7 @@ export default function CreatePage() {
             max="11"
             name="width"
             id="width"
-            placeholder="Width"
+            placeholder="4"
             required
           />
         </div>
@@ -73,18 +76,13 @@ export default function CreatePage() {
             max="11"
             name="height"
             id="height"
-            placeholder="Height"
+            placeholder="4"
             required
           />
         </div>
       </div>
-      <button
-        type="submit"
-        className="bg-emerald-400 border border-emerald-600 text-white font-bold p-4 rounded-xl outline-none"
-      >
-        Create
-      </button>
-    </form>
+      <Button type="submit">Create</Button>
+    </Form>
   );
 }
 

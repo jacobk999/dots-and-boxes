@@ -49,17 +49,12 @@ export function Room({ initialRoom }: RoomProps) {
   }, [room, edited]);
 
   return (
-    <div>
-      <p>
-        {room.name} - {room.id}
-      </p>
-      <Game
-        room={room}
-        setRoom={(room) => {
-          setRoom(room);
-          setEdited(true);
-        }}
-      />
-    </div>
+    <Game
+      room={room}
+      setRoom={(room) => {
+        setRoom(room);
+        setEdited(true);
+      }}
+    />
   );
 }

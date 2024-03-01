@@ -12,5 +12,9 @@ export default async function RoomPage({ params }: { params: { id: string } }) {
 
   const [room] = data;
 
-  return <Room initialRoom={room} />;
+  return (
+    <div className="w-full flex justify-center">
+      <Room initialRoom={room} />
+    </div>
+  );
 }

@@ -5,6 +5,8 @@ import { supabase } from "~/utils/supabase";
 import { Label } from "~/components/Label";
 import { Input } from "~/components/Input";
 import { z } from "zod";
+import { Button } from "~/components/Button";
+import { Form } from "~/components/Form";
 
 const JoinSchema = z.object({
   username: z.string().min(1).max(16),
@@ -15,7 +17,7 @@ export default function JoinPage() {
   const router = useRouter();
 
   return (
-    <form
+    <Form
       onSubmit={async (event) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
@@ -25,35 +27,32 @@ export default function JoinPage() {
         localStorage.setItem("player", data.player);
         router.push(`/room/${data.id}`);
       }}
-      className="flex flex-col gap-4 p-4"
     >
-      <Label htmlFor="username">Username</Label>
-      <Input
-        type="text"
-        name="username"
-        id="username"
-        placeholder="Username"
-        minLength={1}
-        maxLength={16}
-        required
-      />
-      <Label htmlFor="roomName">Room Name</Label>
-      <Input
-        type="text"
-        name="roomName"
-        id="roomName"
-        placeholder="Room Name"
-        required
-        className="bg-slate-100 p-4 w-full rounded-xl outline-none"
-      />
-
-      <button
-        type="submit"
-        className="bg-emerald-400 border border-emerald-600 text-white font-bold p-4 rounded-xl outline-none"
-      >
-        Join
-      </button>
-    </form>
+      <div>
+        <Label htmlFor="username">Username</Label>
+        <Input
+          type="text"
+          name="username"
+          id="username"
+          placeholder="Pineapple"
+          minLength={1}
+          maxLength={16}
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="roomName">Room Name</Label>
+        <Input
+          type="text"
+          name="roomName"
+          id="roomName"
+          placeholder="Strawberry"
+          required
+          className="bg-slate-100 p-4 w-full rounded-xl outline-none"
+        />
+      </div>
+      <Button type="submit">Join</Button>
+    </Form>
   );
 }
 

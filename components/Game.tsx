@@ -9,6 +9,7 @@ import {
 } from "~/hooks/useBoard";
 import { Tables } from "~/utils/database.types";
 import { Modal, ModalContent } from "./Modal";
+import { Button } from "./Button";
 
 const GameContext = createContext<Tables<"rooms"> & BoardState>({
   id: 0,
@@ -41,15 +42,19 @@ export function Game({ room, setRoom }: GameProps) {
         ...board,
       }}
     >
-      <div className="flex flex-col p-2 md:flex-row gap-4">
+      <div className="flex flex-col p-2 gap-4 items-center w-fit">
+        <div className="flex justify-between w-full">
+          <h1 className="font-bold text-3xl">{room.name}</h1>
+          <button>Share</button>
+        </div>
         <Board />
         <Scores />
       </div>
-      <Modal open={board.ended}>
+      <Modal open={true}>
         <ModalContent>
-          <h1>You Lose</h1>
+          <h1 className="text-2xl font-bold">You Lose</h1>
           <Scores />
-          <button>Play Again</button>
+          <Button>Play Again</Button>
         </ModalContent>
       </Modal>
     </GameContext.Provider>
@@ -102,43 +107,55 @@ function Board() {
 }
 
 const ScoreColor: Record<Exclude<Cell, Cell.Empty>, string> = {
-  [Cell.Player1]:
-    "bg-red-100 text-red-900 border-red-200 data-[active=true]:border-red-400",
-  [Cell.Player2]:
-    "bg-blue-100 text-blue-900 border-blue-200 data-[active=true]:border-blue-400",
-  [Cell.Player3]:
-    "bg-green-100 text-green-900 border-green-200 data-[active=true]:border-green-400",
-  [Cell.Player4]:
-    "bg-yellow-100 text-yellow-900 border-yellow-200 data-[active=true]:border-yellow-400",
-  [Cell.Player5]:
-    "bg-orange-100 text-orange-900 border-orange-200 data-[active=true]:border-orange-400",
-  [Cell.Player6]:
-    "bg-teal-100 text-teal-900 border-teal-200 data-[active=true]:border-teal-400",
-  [Cell.Player7]:
-    "bg-purple-100 text-purple-900 border-purple-200 data-[active=true]:border-purple-400",
-  [Cell.Player8]:
-    "bg-pink-100 text-pink-900 border-pink-200 data-[active=true]:border-pink-400",
+  [Cell.Player1]: "bg-red-200 text-red-900 border-red-400",
+  [Cell.Player2]: "bg-sky-200 text-sky-900 border-sky-400",
+  [Cell.Player3]: "bg-green-200 text-green-900 border-green-400",
+  [Cell.Player4]: "bg-yellow-200 text-yellow-900 border-yellow-400",
+  [Cell.Player5]: "bg-orange-200 text-orange-900 border-orange-400",
+  [Cell.Player6]: "bg-teal-200 text-teal-900 border-teal-400",
+  [Cell.Player7]: "bg-purple-200 text-purple-900 border-purple-400",
+  [Cell.Player8]: "bg-pink-200 text-pink-900 border-pink-400",
+};
+
+const TurnIndicatorColor: Record<Exclude<Cell, Cell.Empty>, string> = {
+  [Cell.Player1]: "bg-red-400",
+  [Cell.Player2]: "bg-sky-400",
+  [Cell.Player3]: "bg-green-400",
+  [Cell.Player4]: "bg-yellow-400",
+  [Cell.Player5]: "bg-orange-400",
+  [Cell.Player6]: "bg-teal-400",
+  [Cell.Player7]: "bg-purple-400",
+  [Cell.Player8]: "bg-pink-400",
 };
 
 function Scores() {
   const { scores, players, turn, ended } = useContext(GameContext);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="grid grid-cols-4 grid-rows-2 gap-3 w-full">
       {players
         .map((player, i) => ({
           player,
           score: scores.get(player) ?? 0,
-          color: ScoreColor[(i + 1) as Exclude<Cell, Cell.Empty>],
+          cell: (i + 1) as Exclude<Cell, Cell.Empty>,
         }))
-        .toSorted((a, b) => b.score - a.score)
-        .map(({ player, score, color }, i) => (
+        .sort((a, b) => b.score - a.score)
+        .map(({ player, score, cell }) => (
           <div
-            key={i}
-            data-active={i + 1 === turn && !ended}
-            className={`drop-shadow-sm p-2 border rounded-md transition-all data-[active=true]:animate-pulse data-[active=true]:font-bold ${color}`}
+            key={cell}
+            data-active={cell === turn && !ended}
+            className={`group drop-shadow-sm p-2 flex flex-col items-center data-[active=true]:border rounded-md transition-all data-[active=true]:font-bold ${ScoreColor[cell]} relative`}
           >
-            {player}: {score}
+            <p>{player}</p>
+            <p className="text-2xl">{score}</p>
+            <span className="absolute -right-1 -top-1 hidden group-data-[active=true]:flex">
+              <span
+                className={`absolute w-full h-full animate-ping rounded-full bg-black  ${TurnIndicatorColor[cell]}`}
+              />
+              <span
+                className={`relative inline-flex w-3 h-3 rounded-full ${TurnIndicatorColor[cell]}`}
+              />
+            </span>
           </div>
         ))}
     </div>
@@ -148,7 +165,7 @@ function Scores() {
 const BoxColor: Record<Cell, string> = {
   [Cell.Empty]: "bg-slate-100",
   [Cell.Player1]: "bg-red-100",
-  [Cell.Player2]: "bg-blue-100",
+  [Cell.Player2]: "bg-sky-100",
   [Cell.Player3]: "bg-green-100",
   [Cell.Player4]: "bg-yellow-100",
   [Cell.Player5]: "bg-orange-100",
@@ -174,7 +191,7 @@ function Dot() {
 const LineColor: Record<Cell, string> = {
   [Cell.Empty]: "bg-slate-200 hover:bg-slate-300",
   [Cell.Player1]: "bg-red-200 pointer-events-none",
-  [Cell.Player2]: "bg-blue-200 pointer-events-none",
+  [Cell.Player2]: "bg-sky-200 pointer-events-none",
   [Cell.Player3]: "bg-green-200 pointer-events-none",
   [Cell.Player4]: "bg-yellow-200 pointer-events-none",
   [Cell.Player5]: "bg-orange-200 pointer-events-none",
