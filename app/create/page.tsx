@@ -1,46 +1,60 @@
 import { redirect } from "next/navigation";
+import { Input } from "~/components/Input";
+import { Label } from "~/components/Label";
 import { supabase } from "~/utils/supabase";
 
 export default function CreatePage() {
   return (
     <form action={createRoom} className="flex flex-col gap-4 p-4">
-      <input
+      <Label htmlFor="id">Username</Label>
+      <Input
         type="text"
         name="name"
+        id="name"
         placeholder="Name"
         required
-        className="bg-slate-100 p-4 rounded-xl outline-none"
+        minLength={1}
+        maxLength={16}
       />
       <div className="flex flex-row gap-4 w-full">
-        <input
-          type="text"
-          name="room"
-          placeholder="Room Name"
-          required
-          className="bg-slate-100 p-4 w-full rounded-xl outline-none"
-        />
-        <input
-          type="number"
-          min="1"
-          max="11"
-          name="width"
-          placeholder="Width"
-          required
-          className="bg-slate-100 p-4 rounded-xl outline-none"
-        />
-        <input
-          type="number"
-          min="1"
-          max="11"
-          name="height"
-          placeholder="Height"
-          required
-          className="bg-slate-100 p-4 rounded-xl outline-none"
-        />
+        <div className="w-full">
+          <Label htmlFor="id">Room Name</Label>
+          <Input
+            type="text"
+            name="room"
+            id="room"
+            placeholder="Room Name"
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="width">Width</Label>
+          <Input
+            type="number"
+            min="1"
+            max="11"
+            name="width"
+            id="width"
+            placeholder="Width"
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="height">Height</Label>
+          <Input
+            type="number"
+            min="1"
+            max="11"
+            name="height"
+            id="height"
+            placeholder="Height"
+            required
+          />
+        </div>
       </div>
       <button
         type="submit"
-        className="bg-emerald-400 text-white font-bold p-4 rounded-xl outline-none"
+        className="bg-emerald-400 border border-emerald-600 text-white font-bold p-4 rounded-xl outline-none"
       >
         Create
       </button>

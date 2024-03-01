@@ -1,19 +1,26 @@
 import { redirect } from "next/navigation";
 import { supabase } from "~/utils/supabase";
+import { Label } from "~/components/Label";
+import { Input } from "~/components/Input";
 
 export default function JoinPage() {
   return (
     <form action={joinRoom} className="flex flex-col gap-4 p-4">
-      <input
+      <Label htmlFor="name">Username</Label>
+      <Input
         type="text"
         name="name"
+        id="name"
         placeholder="Name"
+        minLength={1}
+        maxLength={16}
         required
-        className="bg-slate-100 p-4 rounded-xl outline-none"
       />
-      <input
+      <Label htmlFor="name">Room</Label>
+      <Input
         type="text"
         name="room"
+        id="room"
         placeholder="Room Name"
         required
         className="bg-slate-100 p-4 w-full rounded-xl outline-none"
@@ -21,7 +28,7 @@ export default function JoinPage() {
 
       <button
         type="submit"
-        className="bg-emerald-400 text-white font-bold p-4 rounded-xl outline-none"
+        className="bg-emerald-400 border border-emerald-600 text-white font-bold p-4 rounded-xl outline-none"
       >
         Join
       </button>
