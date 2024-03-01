@@ -48,7 +48,7 @@ export default function JoinPage() {
           id="roomName"
           placeholder="Strawberry"
           required
-          className="bg-slate-100 p-4 w-full rounded-xl outline-none"
+          className="w-full rounded-xl bg-slate-100 p-4 outline-none"
         />
       </div>
       <Button type="submit">Join</Button>

@@ -13,7 +13,7 @@ export default async function RoomPage({ params }: { params: { id: string } }) {
   const [room] = data;
 
   return (
-    <div className="w-full flex justify-center">
+    <div className="flex w-full justify-center">
       <Room initialRoom={room} />
     </div>
   );

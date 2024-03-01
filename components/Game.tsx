@@ -10,6 +10,7 @@ import {
 import { Tables } from "~/utils/database.types";
 import { Modal, ModalContent } from "./Modal";
 import { Button } from "./Button";
+import { motion } from "framer-motion";
 
 const GameContext = createContext<Tables<"rooms"> & BoardState>({
   id: 0,
@@ -42,17 +43,17 @@ export function Game({ room, setRoom }: GameProps) {
         ...board,
       }}
     >
-      <div className="flex flex-col p-2 gap-4 items-center w-fit">
-        <div className="flex justify-between w-full">
-          <h1 className="font-bold text-3xl">{room.name}</h1>
+      <div className="fixed inset-0 m-auto flex h-fit w-fit flex-col items-center gap-4 p-2">
+        <div className="flex w-full justify-between">
+          <h1 className="text-3xl font-bold">{room.name}</h1>
           <button>Share</button>
         </div>
         <Board />
         <Scores />
       </div>
-      <Modal open={true}>
+      <Modal open={board.ended}>
         <ModalContent>
-          <h1 className="text-2xl font-bold">You Lose</h1>
+          <h1 className="text-4xl font-bold">You Lose</h1>
           <Scores />
           <Button>Play Again</Button>
         </ModalContent>
@@ -132,7 +133,7 @@ function Scores() {
   const { scores, players, turn, ended } = useContext(GameContext);
 
   return (
-    <div className="grid grid-cols-4 grid-rows-2 gap-3 w-full">
+    <div className="grid w-full grid-cols-4 grid-rows-2 gap-3">
       {players
         .map((player, i) => ({
           player,
@@ -141,22 +142,25 @@ function Scores() {
         }))
         .sort((a, b) => b.score - a.score)
         .map(({ player, score, cell }) => (
-          <div
+          <motion.div
             key={cell}
             data-active={cell === turn && !ended}
-            className={`group drop-shadow-sm p-2 flex flex-col items-center data-[active=true]:border rounded-md transition-all data-[active=true]:font-bold ${ScoreColor[cell]} relative`}
+            layout
+            style={{ borderRadius: "6px" }}
+            transition={{ type: "spring", damping: 25, stiffness: 120 }}
+            className={`group flex flex-col items-center p-2 drop-shadow-sm data-[active=true]:border data-[active=true]:font-bold ${ScoreColor[cell]} relative`}
           >
             <p>{player}</p>
             <p className="text-2xl">{score}</p>
             <span className="absolute -right-1 -top-1 hidden group-data-[active=true]:flex">
               <span
-                className={`absolute w-full h-full animate-ping rounded-full bg-black  ${TurnIndicatorColor[cell]}`}
+                className={`absolute h-full w-full animate-ping rounded-full bg-black  ${TurnIndicatorColor[cell]}`}
               />
               <span
-                className={`relative inline-flex w-3 h-3 rounded-full ${TurnIndicatorColor[cell]}`}
+                className={`relative inline-flex h-3 w-3 rounded-full ${TurnIndicatorColor[cell]}`}
               />
             </span>
-          </div>
+          </motion.div>
         ))}
     </div>
   );
@@ -176,14 +180,14 @@ const BoxColor: Record<Cell, string> = {
 
 function Box({ value }: { value: Cell }) {
   return (
-    <div className={`${BoxColor[value]} transition-colors aspect-square`} />
+    <div className={`${BoxColor[value]} aspect-square transition-colors`} />
   );
 }
 
 function Dot() {
   return (
-    <div className="w-3 h-3">
-      <div className="bg-slate-500 rounded-full relative w-4 h-4 -left-0.5 -top-0.5" />
+    <div className="h-3 w-3">
+      <div className="relative -left-0.5 -top-0.5 h-4 w-4 rounded-full bg-slate-500" />
     </div>
   );
 }
@@ -219,9 +223,9 @@ function Line({
       onClick={() => {
         if (value !== 0) return;
 
-        const player = localStorage.getItem("player")!;
-        const playerIndex = players.indexOf(player) + 1;
-        if (playerIndex !== turn) return;
+        // const player = localStorage.getItem("player")!;
+        // const playerIndex = players.indexOf(player) + 1;
+        // if (playerIndex !== turn) return;
 
         setLine(x, y, orientation);
       }}

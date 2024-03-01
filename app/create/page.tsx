@@ -43,7 +43,7 @@ export default function CreatePage() {
           maxLength={16}
         />
       </div>
-      <div className="flex flex-row gap-4 w-full">
+      <div className="flex w-full flex-row gap-4">
         <div className="w-full">
           <Label htmlFor="roomName">Room Name</Label>
           <Input
