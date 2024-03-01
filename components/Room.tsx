@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Tables } from "~/utils/database.types";
 import { supabase } from "~/utils/supabase";
+import { Game } from "./Game";
 
 interface RoomProps {
   initialRoom: Tables<"rooms">;
@@ -10,10 +11,12 @@ interface RoomProps {
 
 export function Room({ initialRoom }: RoomProps) {
   const [room, setRoom] = useState(initialRoom);
+  const [edited, setEdited] = useState(false);
 
+  // Subscribe to changes within the room
   useEffect(() => {
     const channel = supabase
-      .channel("room")
+      .channel("room" + initialRoom.id)
       .on(
         "postgres_changes",
         {
@@ -33,17 +36,30 @@ export function Room({ initialRoom }: RoomProps) {
     };
   }, [initialRoom]);
 
+  // Update the database when the room is edited by the user
+  useEffect(() => {
+    if (!edited) return;
+
+    async function update() {
+      await supabase.from("rooms").update(room).eq("id", room.id);
+      setEdited(false);
+    }
+
+    update();
+  }, [room, edited]);
+
   return (
     <div>
       <p>
         {room.name} - {room.id}
       </p>
-      <div>
-        {room.players.map((player) => (
-          <div key={player}>{player}</div>
-        ))}
-      </div>
-      <Board />
+      <Game
+        room={room}
+        setRoom={(room) => {
+          setRoom(room);
+          setEdited(true);
+        }}
+      />
     </div>
   );
 }

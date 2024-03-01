@@ -3,10 +3,28 @@ import { supabase } from "~/utils/supabase";
 
 export default function JoinPage() {
   return (
-    <form action={joinRoom}>
-      <input type="text" name="name" placeholder="Name" />
-      <input type="text" name="room" placeholder="Room Name" />
-      <button type="submit">Join</button>
+    <form action={joinRoom} className="flex flex-col gap-4 p-4">
+      <input
+        type="text"
+        name="name"
+        placeholder="Name"
+        required
+        className="bg-slate-100 p-4 rounded-xl outline-none"
+      />
+      <input
+        type="text"
+        name="room"
+        placeholder="Room Name"
+        required
+        className="bg-slate-100 p-4 w-full rounded-xl outline-none"
+      />
+
+      <button
+        type="submit"
+        className="bg-emerald-400 text-white font-bold p-4 rounded-xl outline-none"
+      >
+        Join
+      </button>
     </form>
   );
 }

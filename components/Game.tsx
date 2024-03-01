@@ -7,27 +7,51 @@ import {
   type BoardState,
   type Orientation,
 } from "~/hooks/useBoard";
+import { Tables } from "~/utils/database.types";
+import { Modal, ModalContent } from "./Modal";
 
-const GameContext = createContext<BoardState>({
+const GameContext = createContext<Tables<"rooms"> & BoardState>({
+  id: 0,
+  created_at: "",
+  name: "",
+  players: [],
   boxes: [],
   verticals: [],
   horizontals: [],
-  setLine: () => {},
+  turn: 1,
   width: 0,
   height: 0,
-  scores: [],
-  turn: 1,
+  setLine: () => {},
+  scores: new Map(),
+  ended: false,
 });
 
-export function Game() {
-  const board = useBoard(9, 9, 8);
+interface GameProps {
+  room: Tables<"rooms">;
+  setRoom: (room: Tables<"rooms">) => void;
+}
+
+export function Game({ room, setRoom }: GameProps) {
+  const board = useBoard(room, setRoom);
 
   return (
-    <GameContext.Provider value={board}>
+    <GameContext.Provider
+      value={{
+        ...room,
+        ...board,
+      }}
+    >
       <div className="flex flex-col p-2 md:flex-row gap-4">
         <Board />
         <Scores />
       </div>
+      <Modal open={board.ended}>
+        <ModalContent>
+          <h1>You Lose</h1>
+          <Scores />
+          <button>Play Again</button>
+        </ModalContent>
+      </Modal>
     </GameContext.Provider>
   );
 }
@@ -97,21 +121,26 @@ const ScoreColor: Record<Exclude<Cell, Cell.Empty>, string> = {
 };
 
 function Scores() {
-  const { scores, turn } = useContext(GameContext);
+  const { scores, players, turn, ended } = useContext(GameContext);
 
   return (
     <div className="flex flex-col gap-3">
-      {scores.map((score, i) => (
-        <div
-          key={i}
-          data-active={i + 1 === turn}
-          className={`drop-shadow-sm p-2 border rounded-md transition-all data-[active=true]:animate-pulse data-[active=true]:font-bold ${
-            ScoreColor[(i + 1) as Exclude<Cell, Cell.Empty>]
-          }`}
-        >
-          Player {i + 1}: {score}
-        </div>
-      ))}
+      {players
+        .map((player, i) => ({
+          player,
+          score: scores.get(player) ?? 0,
+          color: ScoreColor[(i + 1) as Exclude<Cell, Cell.Empty>],
+        }))
+        .toSorted((a, b) => b.score - a.score)
+        .map(({ player, score, color }, i) => (
+          <div
+            key={i}
+            data-active={i + 1 === turn && !ended}
+            className={`drop-shadow-sm p-2 border rounded-md transition-all data-[active=true]:animate-pulse data-[active=true]:font-bold ${color}`}
+          >
+            {player}: {score}
+          </div>
+        ))}
     </div>
   );
 }

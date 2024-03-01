@@ -6,7 +6,7 @@ export const revalidate = 0;
 export default async function RoomPage({ params }: { params: { id: string } }) {
   const { data } = await supabase.from("rooms").select("*").eq("id", params.id);
 
-  if (!data) {
+  if (!data?.length) {
     return <div>Room not found</div>;
   }
 

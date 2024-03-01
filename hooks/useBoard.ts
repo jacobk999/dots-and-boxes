@@ -36,7 +36,7 @@ export function useBoard(
   function setBox(x: number, y: number, value: Cell) {
     const newBoxes = [...boxes];
     newBoxes[y][x] = value;
-    setBoxes(newBoxes);
+    setRoom({ ...room, boxes: newBoxes });
   }
 
   function setLine(x: number, y: number, orientation: Orientation) {
@@ -45,7 +45,7 @@ export function useBoard(
     if (orientation === "vertical") {
       const newVerticals = [...verticals];
       newVerticals[y][x] = turn;
-      setVerticals(newVerticals);
+      setRoom({ ...room, verticals: newVerticals });
 
       // Check if the box to the right is complete
       if (isBoxComplete(x, y)) {
@@ -61,7 +61,7 @@ export function useBoard(
     } else {
       const newHorizontals = [...horizontals];
       newHorizontals[y][x] = turn;
-      setHorizontals(newHorizontals);
+      setRoom({ ...room, horizontals: newHorizontals });
 
       // Check if the box below is complete
       if (isBoxComplete(x, y)) {
@@ -77,7 +77,7 @@ export function useBoard(
     }
 
     if (!hasCompletedBox) {
-      setTurn((turn) => (turn % players) + 1);
+      setRoom({ ...room, turn: (turn % players.length) + 1 });
     }
   }
 
@@ -96,13 +96,21 @@ export function useBoard(
     return score;
   }, [boxes, players]);
 
+  const ended = useMemo(() => {
+    for (const row of boxes) {
+      for (const box of row) {
+        if (box === Cell.Empty) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }, [boxes]);
+
   return {
     scores,
+    ended,
+    setLine,
   };
-}
-
-export function createGrid<T>(width: number, height: number, value: T) {
-  return Array.from({ length: height }, () =>
-    Array.from({ length: width }, () => value)
-  );
 }
