@@ -1,26 +1,47 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { supabase } from "~/utils/supabase";
 import { Label } from "~/components/Label";
 import { Input } from "~/components/Input";
+import { z } from "zod";
+
+const JoinSchema = z.object({
+  username: z.string().min(1).max(16),
+  roomName: z.string().min(1).max(32),
+});
 
 export default function JoinPage() {
+  const router = useRouter();
+
   return (
-    <form action={joinRoom} className="flex flex-col gap-4 p-4">
-      <Label htmlFor="name">Username</Label>
+    <form
+      onSubmit={async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const data = await joinRoom(formData);
+        if (!data) return;
+
+        localStorage.setItem("player", data.player);
+        router.push(`/room/${data.id}`);
+      }}
+      className="flex flex-col gap-4 p-4"
+    >
+      <Label htmlFor="username">Username</Label>
       <Input
         type="text"
-        name="name"
-        id="name"
-        placeholder="Name"
+        name="username"
+        id="username"
+        placeholder="Username"
         minLength={1}
         maxLength={16}
         required
       />
-      <Label htmlFor="name">Room</Label>
+      <Label htmlFor="roomName">Room Name</Label>
       <Input
         type="text"
-        name="room"
-        id="room"
+        name="roomName"
+        id="roomName"
         placeholder="Room Name"
         required
         className="bg-slate-100 p-4 w-full rounded-xl outline-none"
@@ -37,12 +58,14 @@ export default function JoinPage() {
 }
 
 async function joinRoom(formData: FormData) {
-  "use server";
+  const { roomName, username } = JoinSchema.parse(
+    Object.fromEntries(formData.entries())
+  );
 
   const { data } = await supabase
     .from("rooms")
     .select("id,players")
-    .eq("name", formData.get("room") as string);
+    .eq("name", roomName);
 
   if (!data) return;
 
@@ -50,8 +73,8 @@ async function joinRoom(formData: FormData) {
 
   await supabase
     .from("rooms")
-    .update({ players: [...room.players, formData.get("name") as string] })
+    .update({ players: [...room.players, username] })
     .eq("id", room.id);
 
-  redirect(`/room/${room.id}`);
+  return { id: room.id, player: username };
 }

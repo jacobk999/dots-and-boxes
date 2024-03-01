@@ -194,13 +194,18 @@ function Line({
   value: Cell;
   orientation: Orientation;
 }) {
-  const { setLine } = useContext(GameContext);
+  const { setLine, players, turn } = useContext(GameContext);
 
   return (
     <button
       className={`transition-colors ${LineColor[value]}`}
       onClick={() => {
         if (value !== 0) return;
+
+        const player = localStorage.getItem("player")!;
+        const playerIndex = players.indexOf(player) + 1;
+        if (playerIndex !== turn) return;
+
         setLine(x, y, orientation);
       }}
     />

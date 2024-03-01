@@ -1,16 +1,40 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { Input } from "~/components/Input";
 import { Label } from "~/components/Label";
 import { supabase } from "~/utils/supabase";
+import { z } from "zod";
+
+const CreateSchema = z.object({
+  username: z.string().min(1).max(16),
+  roomName: z.string().min(1).max(32),
+  width: z.coerce.number().min(1).max(11),
+  height: z.coerce.number().min(1).max(11),
+});
 
 export default function CreatePage() {
+  const router = useRouter();
+
   return (
-    <form action={createRoom} className="flex flex-col gap-4 p-4">
-      <Label htmlFor="id">Username</Label>
+    <form
+      onSubmit={async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const data = await createRoom(formData);
+
+        if (!data) return;
+
+        localStorage.setItem("player", data.player);
+        router.push(`/room/${data.id}`);
+      }}
+      className="flex flex-col gap-4 p-4"
+    >
+      <Label htmlFor="username">Username</Label>
       <Input
         type="text"
-        name="name"
-        id="name"
+        name="username"
+        id="username"
         placeholder="Name"
         required
         minLength={1}
@@ -18,13 +42,15 @@ export default function CreatePage() {
       />
       <div className="flex flex-row gap-4 w-full">
         <div className="w-full">
-          <Label htmlFor="id">Room Name</Label>
+          <Label htmlFor="roomName">Room Name</Label>
           <Input
             type="text"
-            name="room"
-            id="room"
+            name="roomName"
+            id="roomName"
             placeholder="Room Name"
             required
+            minLength={1}
+            maxLength={32}
           />
         </div>
         <div>
@@ -63,22 +89,21 @@ export default function CreatePage() {
 }
 
 async function createRoom(formData: FormData) {
-  "use server";
-
-  const width = +formData.get("width")!;
-  const height = +formData.get("height")!;
+  const { username, roomName, width, height } = CreateSchema.parse(
+    Object.fromEntries(formData.entries())
+  );
 
   const { data } = await supabase
     .from("rooms")
     .insert({
-      name: formData.get("room") as string,
+      name: roomName,
       width,
       height,
       boxes: createGrid(width, height),
       horizontals: createGrid(width, height + 1),
       verticals: createGrid(width + 1, height),
       turn: 1,
-      players: [formData.get("name") as string],
+      players: [username],
     })
     .select("id");
 
@@ -86,7 +111,10 @@ async function createRoom(formData: FormData) {
 
   const [{ id }] = data;
 
-  redirect(`/room/${id}`);
+  return {
+    id,
+    player: username,
+  };
 }
 
 function createGrid(width: number, height: number) {
