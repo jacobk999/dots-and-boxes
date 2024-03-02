@@ -18,6 +18,7 @@ export type Database = {
           id: number;
           name: string | null;
           players: string[];
+          started: boolean;
           turn: number;
           verticals: number[][];
           width: number;
@@ -30,6 +31,7 @@ export type Database = {
           id?: number;
           name?: string | null;
           players: string[];
+          started?: boolean;
           turn?: number;
           verticals: number[][];
           width: number;
@@ -42,6 +44,7 @@ export type Database = {
           id?: number;
           name?: string | null;
           players?: string[];
+          started?: boolean;
           turn?: number;
           verticals?: number[][];
           width?: number;

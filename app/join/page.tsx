@@ -7,7 +7,7 @@ import { Input } from "~/components/Input";
 import { z } from "zod";
 import { Button } from "~/components/Button";
 import { Form } from "~/components/Form";
-import { Logo } from "~/components/Logo";
+import { Logo } from "~/icons/Logo";
 
 const JoinSchema = z.object({
   username: z.string().min(1).max(16),
@@ -19,13 +19,12 @@ export default function JoinPage() {
 
   return (
     <Form
-      onSubmit={async (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const data = await joinRoom(formData);
+      schema={JoinSchema}
+      onSubmit={async (values) => {
+        const data = await joinRoom(values);
         if (!data) return;
 
-        localStorage.setItem("player", data.player);
+        sessionStorage.setItem("player", data.player);
         router.push(`/room/${data.id}`);
       }}
     >
@@ -34,11 +33,10 @@ export default function JoinPage() {
           <Logo />
           <h1 className="text-4xl font-bold">Dots and Boxes</h1>
         </div>
-        <Label htmlFor="username">Username</Label>
         <Input
           type="text"
+          label="Username"
           name="username"
-          id="username"
           placeholder="Pineapple"
           minLength={1}
           maxLength={16}
@@ -46,26 +44,23 @@ export default function JoinPage() {
         />
       </div>
       <div>
-        <Label htmlFor="roomName">Room Name</Label>
         <Input
           type="text"
           name="roomName"
-          id="roomName"
+          label="Room Name"
           placeholder="Strawberry"
           required
           className="w-full rounded-xl bg-slate-100 p-4 outline-none"
         />
       </div>
-      <Button type="submit">Join</Button>
+      <Button type="submit" full color="emerald">
+        Join
+      </Button>
     </Form>
   );
 }
 
-async function joinRoom(formData: FormData) {
-  const { roomName, username } = JoinSchema.parse(
-    Object.fromEntries(formData.entries())
-  );
-
+async function joinRoom({ roomName, username }: z.infer<typeof JoinSchema>) {
   const { data } = await supabase
     .from("rooms")
     .select("id,players")

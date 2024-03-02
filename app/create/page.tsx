@@ -2,100 +2,116 @@
 
 import { useRouter } from "next/navigation";
 import { Input } from "~/components/Input";
-import { Label } from "~/components/Label";
 import { supabase } from "~/utils/supabase";
 import { z } from "zod";
 import { Button } from "~/components/Button";
 import { Form } from "~/components/Form";
-import { Logo } from "~/components/Logo";
+import { Logo } from "~/icons/Logo";
+import { GameContext } from "~/components/Game";
+import { Board } from "~/components/Board";
+import { useState } from "react";
+
+const MIN_SIZE = 1;
+const MAX_SIZE = 10;
 
 const CreateSchema = z.object({
   username: z.string().min(1).max(16),
   roomName: z.string().min(1).max(32),
-  width: z.coerce.number().min(1).max(11),
-  height: z.coerce.number().min(1).max(11),
+  width: z.coerce.number().min(MIN_SIZE).max(MAX_SIZE),
+  height: z.coerce.number().min(MIN_SIZE).max(MAX_SIZE),
 });
 
 export default function CreatePage() {
   const router = useRouter();
 
+  const [width, setWidth] = useState(4);
+  const [height, setHeight] = useState(4);
+
   return (
     <Form
-      onSubmit={async (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const data = await createRoom(formData);
+      schema={CreateSchema}
+      onSubmit={async (values) => {
+        const data = await createRoom(values);
 
         if (!data) return;
 
-        localStorage.setItem("player", data.player);
+        sessionStorage.setItem("player", data.player);
         router.push(`/room/${data.id}`);
       }}
     >
       <div className="flex items-center justify-center gap-2">
         <Logo />
-        <h1 className="text-4xl font-bold">Dots and Boxes</h1>
+        <h1 className="text-4xl font-bold text-slate-500">
+          <span className="text-red-200">Dots</span> and{" "}
+          <span className="text-sky-200">Boxes</span>
+        </h1>
       </div>
-      <div className="w-full">
-        <Label htmlFor="username">Username</Label>
+      <Input
+        label="Username"
+        name="username"
+        type="text"
+        placeholder="Pineapple"
+      />
+      <Input
+        name="roomName"
+        label="Room Name"
+        type="text"
+        placeholder="Strawberry"
+      />
+      <div className="flex gap-4">
         <Input
-          type="text"
-          name="username"
-          id="username"
-          placeholder="Pineapple"
-          required
-          minLength={1}
-          maxLength={16}
+          name="width"
+          label="Width"
+          type="number"
+          onChange={(event) =>
+            setWidth(
+              Math.max(Math.min(+event.target.value, MAX_SIZE), MIN_SIZE)
+            )
+          }
+        />
+        <Input
+          name="height"
+          label="Height"
+          type="number"
+          onChange={(event) =>
+            setHeight(
+              Math.max(Math.min(+event.target.value, MAX_SIZE), MIN_SIZE)
+            )
+          }
         />
       </div>
-      <div className="flex w-full flex-row gap-4">
-        <div className="w-full">
-          <Label htmlFor="roomName">Room Name</Label>
-          <Input
-            type="text"
-            name="roomName"
-            id="roomName"
-            placeholder="Strawberry"
-            required
-            minLength={1}
-            maxLength={32}
-          />
-        </div>
-        <div className="w-fit">
-          <Label htmlFor="width">Width</Label>
-          <Input
-            type="number"
-            min="1"
-            max="11"
-            name="width"
-            id="width"
-            placeholder="4"
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="height">Height</Label>
-          <Input
-            type="number"
-            min="1"
-            max="11"
-            name="height"
-            id="height"
-            placeholder="4"
-            required
-          />
-        </div>
+      <div className="my-2 flex items-center justify-center">
+        <GameContext.Provider
+          value={{
+            boxes: createGrid(width, height),
+            ended: false,
+            height,
+            horizontals: createGrid(width, height + 1),
+            players: [],
+            scores: new Map(),
+            setLine: () => {},
+            started: false,
+            turn: 1,
+            verticals: createGrid(width + 1, height),
+            width,
+          }}
+        >
+          <Board />
+        </GameContext.Provider>
       </div>
-      <Button type="submit">Create</Button>
+      <Button type="submit" full color="emerald">
+        Create
+      </Button>
     </Form>
   );
 }
 
-async function createRoom(formData: FormData) {
-  const { username, roomName, width, height } = CreateSchema.parse(
-    Object.fromEntries(formData.entries())
-  );
-
+async function createRoom({
+  username,
+  roomName,
+  width,
+  height,
+}: z.infer<typeof CreateSchema>) {
   const { data } = await supabase
     .from("rooms")
     .insert({
