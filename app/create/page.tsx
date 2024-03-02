@@ -7,6 +7,7 @@ import { supabase } from "~/utils/supabase";
 import { z } from "zod";
 import { Button } from "~/components/Button";
 import { Form } from "~/components/Form";
+import { Logo } from "~/components/Logo";
 
 const CreateSchema = z.object({
   username: z.string().min(1).max(16),
@@ -31,6 +32,10 @@ export default function CreatePage() {
         router.push(`/room/${data.id}`);
       }}
     >
+      <div className="flex items-center justify-center gap-2">
+        <Logo />
+        <h1 className="text-4xl font-bold">Dots and Boxes</h1>
+      </div>
       <div className="w-full">
         <Label htmlFor="username">Username</Label>
         <Input
