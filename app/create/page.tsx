@@ -41,10 +41,6 @@ export default function CreatePage() {
     >
       <div className="flex items-center justify-center gap-2">
         <Logo />
-        <h1 className="text-4xl font-bold text-slate-500">
-          <span className="text-red-200">Dots</span> and{" "}
-          <span className="text-sky-200">Boxes</span>
-        </h1>
       </div>
       <Input
         label="Username"

@@ -31,7 +31,6 @@ export default function JoinPage() {
       <div>
         <div className="flex items-center justify-center gap-2">
           <Logo />
-          <h1 className="text-4xl font-bold">Dots and Boxes</h1>
         </div>
         <Input
           type="text"
