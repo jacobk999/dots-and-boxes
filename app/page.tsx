@@ -45,10 +45,10 @@ export default function Home() {
 						Join
 					</TabsTrigger>
 				</TabsList>
-				<TabsContent value="create">
+				<TabsContent value="create" className="h-[600px]">
 					<CreateGameCard />
 				</TabsContent>
-				<TabsContent value="join">
+				<TabsContent value="join" className="h-[600px]">
 					<JoinGameCard />
 				</TabsContent>
 			</Tabs>
