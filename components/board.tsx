@@ -100,7 +100,7 @@ function Box({ value }: { value: Cell }) {
 
 function Dot() {
 	return (
-		<div className="h-3 w-3 z-50">
+		<div className="z-50 h-3 w-3">
 			<div className="relative top-1/2 left-1/2 z-10 h-[1.125rem] w-[1.125rem] translate-x-[-50%] translate-y-[-50%] rounded-full bg-accent-foreground" />
 		</div>
 	);
@@ -137,7 +137,7 @@ function Line({
 	return (
 		<button
 			type="button"
-			className={cn("transition-colors z-40", LineColor[value])}
+			className={cn("z-40 transition-colors", LineColor[value])}
 		/>
 	);
 }

@@ -87,7 +87,7 @@ export default function RoomPage() {
 				</DialogPortal>
 			</Dialog>
 
-			<div className="flex w-full justify-between items-center">
+			<div className="flex w-full items-center justify-between">
 				<LogoIcon flat />
 				<div className="flex gap-2">
 					<ThemeSwitcher />
