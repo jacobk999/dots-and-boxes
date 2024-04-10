@@ -78,7 +78,7 @@ export function Board({ width, board }: BoardProps) {
 }
 
 const BoxColor: Record<Cell, string> = {
-	[Cell.Empty]: "bg-slate-100",
+	[Cell.Empty]: "bg-gray-100",
 	[Cell.Player1]: "bg-red-100",
 	[Cell.Player2]: "bg-sky-100",
 	[Cell.Player3]: "bg-green-100",
@@ -98,7 +98,7 @@ function Box({ value }: { value: Cell }) {
 function Dot() {
 	return (
 		<div className="h-3 w-3">
-			<div className="relative -left-0.5 -top-0.5 h-4 w-4 rounded-full bg-slate-500" />
+			<div className="relative -left-0.5 -top-0.5 h-4 w-4 rounded-full bg-gray-500" />
 		</div>
 	);
 }
@@ -109,7 +109,7 @@ enum Orientation {
 }
 
 const LineColor: Record<Cell, string> = {
-	[Cell.Empty]: "bg-slate-200 hover:bg-slate-300 disabled:pointer-events-none",
+	[Cell.Empty]: "bg-gray-200 hover:bg-gray-300 disabled:pointer-events-none",
 	[Cell.Player1]: "bg-red-200 pointer-events-none",
 	[Cell.Player2]: "bg-sky-200 pointer-events-none",
 	[Cell.Player3]: "bg-green-200 pointer-events-none",
