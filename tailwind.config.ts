@@ -54,6 +54,46 @@ const config = {
 					DEFAULT: "hsl(var(--card))",
 					foreground: "hsl(var(--card-foreground))",
 				},
+				red: {
+					DEFAULT: "hsl(var(--red))",
+					scenery: "hsl(var(--red-scenery))",
+					foreground: "hsl(var(--red-foreground))",
+				},
+				orange: {
+					DEFAULT: "hsl(var(--orange))",
+					scenery: "hsl(var(--orange-scenery))",
+					foreground: "hsl(var(--orange-foreground))",
+				},
+				yellow: {
+					DEFAULT: "hsl(var(--yellow))",
+					scenery: "hsl(var(--yellow-scenery))",
+					foreground: "hsl(var(--yellow-foreground))",
+				},
+				green: {
+					DEFAULT: "hsl(var(--green))",
+					scenery: "hsl(var(--green-scenery))",
+					foreground: "hsl(var(--green-foreground))",
+				},
+				blue: {
+					DEFAULT: "hsl(var(--blue))",
+					scenery: "hsl(var(--blue-scenery))",
+					foreground: "hsl(var(--blue-foreground))",
+				},
+				indigo: {
+					DEFAULT: "hsl(var(--indigo))",
+					scenery: "hsl(var(--indigo-scenery))",
+					foreground: "hsl(var(--indigo-foreground))",
+				},
+				purple: {
+					DEFAULT: "hsl(var(--purple))",
+					scenery: "hsl(var(--purple-scenery))",
+					foreground: "hsl(var(--purple-foreground))",
+				},
+				pink: {
+					DEFAULT: "hsl(var(--pink))",
+					scenery: "hsl(var(--pink-scenery))",
+					foreground: "hsl(var(--pink-foreground))",
+				},
 			},
 			borderRadius: {
 				lg: "var(--radius)",

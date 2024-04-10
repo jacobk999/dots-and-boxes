@@ -6,11 +6,11 @@ pre-commit:
   commands:
     check:
       glob: "*.{js,cjs,mjs,jsx,ts,tsx,mts,d.ts,d.mts,json,jsonc}"
-      run: pnpm check --apply --no-errors-on-unmatched --files-ignore-unknown=true {staged_files} && git update-index --again
+      run: pnpm check --apply {staged_files} && git update-index --again
 
 pre-push:
   parallel: true
   commands:
     check:
       glob: "*.{js,cjs,mjs,jsx,ts,tsx,mts,d.ts,d.mts,json,jsonc}"
-      run: pnpm check --no-errors-on-unmatched --files-ignore-unknown=true {push_files}
+      run: pnpm check {push_files}

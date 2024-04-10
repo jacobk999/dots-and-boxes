@@ -1,3 +1,6 @@
+import { Fragment } from "react";
+import { cn } from "~/lib/utils";
+
 enum Cell {
 	Empty = 0,
 	Player1 = 1,
@@ -41,14 +44,14 @@ export function Board({ width, board }: BoardProps) {
 		<div
 			className="grid"
 			style={{
-				gridTemplateColumns: `repeat(${width}, 12px minmax(0, 80px)) 12px`,
+				gridTemplateColumns: `repeat(${width}, 12px minmax(0, 93px)) 12px`,
 			}}
 		>
 			{board.horizontals.map((row, y) => (
-				<>
+				<Fragment key={`frag-${y}`}>
 					<Dot />
 					{row.map((value, x) => (
-						<>
+						<Fragment key={`frag-h-${x}-${y}`}>
 							<Line
 								x={x}
 								y={y}
@@ -56,10 +59,10 @@ export function Board({ width, board }: BoardProps) {
 								orientation={Orientation.Horizontal}
 							/>
 							<Dot />
-						</>
+						</Fragment>
 					))}
 					{board.verticals[y]?.map((value, x) => (
-						<>
+						<Fragment key={`frag-v-${x}-${y}`}>
 							<Line
 								x={x}
 								y={y}
@@ -69,36 +72,36 @@ export function Board({ width, board }: BoardProps) {
 							{board.boxes[y]?.[x] !== undefined && (
 								<Box value={board.boxes[y][x]} />
 							)}
-						</>
+						</Fragment>
 					))}
-				</>
+				</Fragment>
 			))}
 		</div>
 	);
 }
 
 const BoxColor: Record<Cell, string> = {
-	[Cell.Empty]: "bg-gray-100",
-	[Cell.Player1]: "bg-red-100",
-	[Cell.Player2]: "bg-sky-100",
-	[Cell.Player3]: "bg-green-100",
-	[Cell.Player4]: "bg-yellow-100",
-	[Cell.Player5]: "bg-orange-100",
-	[Cell.Player6]: "bg-teal-100",
-	[Cell.Player7]: "bg-purple-100",
-	[Cell.Player8]: "bg-pink-100",
+	[Cell.Empty]: "bg-background",
+	[Cell.Player1]: "bg-red/75",
+	[Cell.Player2]: "bg-blue/75",
+	[Cell.Player3]: "bg-green/75",
+	[Cell.Player4]: "bg-yellow/75",
+	[Cell.Player5]: "bg-orange/75",
+	[Cell.Player6]: "bg-indigo/75",
+	[Cell.Player7]: "bg-purple/75",
+	[Cell.Player8]: "bg-pink/75",
 };
 
 function Box({ value }: { value: Cell }) {
 	return (
-		<div className={`${BoxColor[value]} aspect-square transition-colors`} />
+		<div className={cn("relative aspect-square scale-105", BoxColor[value])} />
 	);
 }
 
 function Dot() {
 	return (
-		<div className="h-3 w-3">
-			<div className="relative -left-0.5 -top-0.5 h-4 w-4 rounded-full bg-gray-500" />
+		<div className="h-3 w-3 z-50">
+			<div className="relative top-1/2 left-1/2 z-10 h-[1.125rem] w-[1.125rem] translate-x-[-50%] translate-y-[-50%] rounded-full bg-accent-foreground" />
 		</div>
 	);
 }
@@ -109,15 +112,15 @@ enum Orientation {
 }
 
 const LineColor: Record<Cell, string> = {
-	[Cell.Empty]: "bg-gray-200 hover:bg-gray-300 disabled:pointer-events-none",
-	[Cell.Player1]: "bg-red-200 pointer-events-none",
-	[Cell.Player2]: "bg-sky-200 pointer-events-none",
-	[Cell.Player3]: "bg-green-200 pointer-events-none",
-	[Cell.Player4]: "bg-yellow-200 pointer-events-none",
-	[Cell.Player5]: "bg-orange-200 pointer-events-none",
-	[Cell.Player6]: "bg-teal-200 pointer-events-none",
-	[Cell.Player7]: "bg-purple-200 pointer-events-none",
-	[Cell.Player8]: "bg-pink-200 pointer-events-none",
+	[Cell.Empty]: "bg-accent hover:bg-accent/70 disabled:pointer-events-none",
+	[Cell.Player1]: "bg-red pointer-events-none",
+	[Cell.Player2]: "bg-blue pointer-events-none",
+	[Cell.Player3]: "bg-green pointer-events-none",
+	[Cell.Player4]: "bg-yellow pointer-events-none",
+	[Cell.Player5]: "bg-orange pointer-events-none",
+	[Cell.Player6]: "bg-indigo pointer-events-none",
+	[Cell.Player7]: "bg-purple pointer-events-none",
+	[Cell.Player8]: "bg-pink pointer-events-none",
 };
 
 function Line({
@@ -132,6 +135,9 @@ function Line({
 	orientation: Orientation;
 }) {
 	return (
-		<button type="button" className={`transition-colors ${LineColor[value]}`} />
+		<button
+			type="button"
+			className={cn("transition-colors z-40", LineColor[value])}
+		/>
 	);
 }

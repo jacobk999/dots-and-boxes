@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { BoardIcon } from "~/components/icons/board";
 import { LoginIcon } from "~/components/icons/login";
+import { LogoIcon } from "~/components/icons/logo";
 import { PlusIcon } from "~/components/icons/plus";
 import { Button } from "~/components/ui/button";
 import {
@@ -31,35 +32,34 @@ export default function Home() {
 	const [tab, setTab] = useState("create");
 
 	return (
-		<Tabs
-			defaultValue="create"
-			className="w-[95%] max-w-[700px] translate-x-[-50%] left-1/2 absolute top-1/2 translate-y-[-50%]"
-			onValueChange={setTab}
-		>
-			<TabsList className="w-full">
-				<TabsTrigger value="create" className="grow gap-1">
-					<PlusIcon filled={tab === "create"} />
-					<p>Create</p>
-				</TabsTrigger>
-				<TabsTrigger value="join" className="grow gap-1">
-					<LoginIcon filled={tab === "join"} />
-					<p>Join</p>
-				</TabsTrigger>
-			</TabsList>
-			<TabsContent value="create">
-				<CreateGameCard />
-			</TabsContent>
-			<TabsContent value="join">
-				<JoinGameCard />
-			</TabsContent>
-		</Tabs>
+		<div className="absolute top-1/2 left-1/2 flex w-[95%] max-w-[700px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6">
+			<LogoIcon flat={false} />
+			<Tabs defaultValue="create" onValueChange={setTab} className="w-full">
+				<TabsList className="w-full">
+					<TabsTrigger value="create" className="grow gap-1">
+						<PlusIcon filled={tab === "create"} />
+						Create
+					</TabsTrigger>
+					<TabsTrigger value="join" className="grow gap-1">
+						<LoginIcon filled={tab === "join"} />
+						Join
+					</TabsTrigger>
+				</TabsList>
+				<TabsContent value="create">
+					<CreateGameCard />
+				</TabsContent>
+				<TabsContent value="join">
+					<JoinGameCard />
+				</TabsContent>
+			</Tabs>
+		</div>
 	);
 }
 
 const SIZE_DEFAULT = 5;
 
 const RoomNameSchema = z.string().min(3).max(16);
-const UsernameSchema = z.string().min(3).max(16);
+const UsernameSchema = z.string().min(3).max(8);
 const SizeSchema = z.coerce.number().min(3).max(11);
 
 const CreateGameSchema = z.object({
@@ -132,8 +132,8 @@ function CreateGameCard() {
 								</FormItem>
 							)}
 						/>
-						<div className="flex gap-4 items-center">
-							<div className="flex flex-col gap-2 grow">
+						<div className="flex items-center gap-4">
+							<div className="flex grow flex-col gap-2">
 								<FormField
 									control={form.control}
 									name="width"
@@ -183,7 +183,7 @@ function CreateGameCard() {
 					<CardFooter>
 						<Button className="w-full gap-2" type="submit">
 							<PlusIcon filled />
-							<p>Create Game</p>
+							Create Game
 						</Button>
 					</CardFooter>
 				</form>
@@ -249,7 +249,7 @@ function JoinGameCard() {
 					<CardFooter>
 						<Button className="w-full gap-2" type="submit">
 							<LoginIcon filled />
-							<p>Join Game</p>
+							Join Game
 						</Button>
 					</CardFooter>
 				</form>

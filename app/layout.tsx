@@ -23,6 +23,12 @@ export default function RootLayout({
 					"min-h-screen bg-background font-sans antialiased",
 					inter.variable,
 				)}
+				style={{
+					backgroundSize: "40px 40px",
+					backgroundImage: `repeating-linear-gradient(0deg, hsl(var(--accent) / 0.15), hsl(var(--accent) / 0.15) 1px, transparent 0, transparent 40px), 
+													repeating-linear-gradient(90deg, hsl(var(--accent) / 0.15), hsl(var(--accent) / 0.15) 1px, transparent 0, transparent 40px)`,
+					boxShadow: "inset 0px 0px 0px 1px hsl(var(--accent) / 0.15)",
+				}}
 			>
 				<ThemeProvider
 					attribute="class"
@@ -30,7 +36,6 @@ export default function RootLayout({
 					enableSystem
 					enableColorScheme
 					disableTransitionOnChange
-					forcedTheme="dark"
 				>
 					{children}
 				</ThemeProvider>
