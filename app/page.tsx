@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { BoardIcon } from "~/components/icons/board";
 import { LoginIcon } from "~/components/icons/login";
 import { PlusIcon } from "~/components/icons/plus";
 import { Button } from "~/components/ui/button";
@@ -30,7 +31,11 @@ export default function Home() {
 	const [tab, setTab] = useState("create");
 
 	return (
-		<Tabs defaultValue="create" className="w-[500px]" onValueChange={setTab}>
+		<Tabs
+			defaultValue="create"
+			className="w-[95%] max-w-[700px] translate-x-[-50%] left-1/2 absolute top-1/2 translate-y-[-50%]"
+			onValueChange={setTab}
+		>
 			<TabsList className="w-full">
 				<TabsTrigger value="create" className="grow gap-1">
 					<PlusIcon filled={tab === "create"} />
@@ -73,8 +78,15 @@ function CreateGameCard() {
 		},
 	});
 
-	const width = form.watch("width");
-	const height = form.watch("height");
+	const width = Math.max(
+		Math.min(form.watch("width"), SizeSchema.maxValue!),
+		SizeSchema.minValue!,
+	);
+
+	const height = Math.max(
+		Math.min(form.watch("height"), SizeSchema.maxValue!),
+		SizeSchema.minValue!,
+	);
 
 	const router = useRouter();
 
@@ -90,7 +102,7 @@ function CreateGameCard() {
 			</CardHeader>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)}>
-					<CardContent className="space-y-2">
+					<CardContent className="flex flex-col gap-2">
 						<FormField
 							control={form.control}
 							name="roomName"
@@ -114,60 +126,64 @@ function CreateGameCard() {
 										<Input {...field} />
 									</FormControl>
 									<FormDescription>
-										Your public display name ({UsernameSchema.minLength} -
+										Your public display name ({UsernameSchema.minLength} -{" "}
 										{UsernameSchema.maxLength} characters)
 									</FormDescription>
 								</FormItem>
 							)}
 						/>
-						<div className="flex gap-2">
-							<FormField
-								control={form.control}
-								name="width"
-								render={({ field }) => (
-									<FormItem className="grow">
-										<FormLabel>Width</FormLabel>
-										<FormControl>
-											<Input
-												{...field}
-												type="number"
-												min={SizeSchema.minValue!}
-												max={SizeSchema.maxValue!}
-											/>
-										</FormControl>
-										<FormDescription>
-											The width of the board ({SizeSchema.minValue}-
-											{SizeSchema.maxValue})
-										</FormDescription>
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name="height"
-								render={({ field }) => (
-									<FormItem className="grow">
-										<FormLabel>Height</FormLabel>
-										<FormControl>
-											<Input
-												{...field}
-												type="number"
-												min={SizeSchema.minValue!}
-												max={SizeSchema.maxValue!}
-											/>
-										</FormControl>
-										<FormDescription>
-											The height of the board ({SizeSchema.minValue}-
-											{SizeSchema.maxValue})
-										</FormDescription>
-									</FormItem>
-								)}
-							/>
+						<div className="flex gap-4 items-center">
+							<div className="flex flex-col gap-2 grow">
+								<FormField
+									control={form.control}
+									name="width"
+									render={({ field }) => (
+										<FormItem className="grow">
+											<FormLabel>Width</FormLabel>
+											<FormControl>
+												<Input
+													{...field}
+													type="number"
+													min={SizeSchema.minValue!}
+													max={SizeSchema.maxValue!}
+												/>
+											</FormControl>
+											<FormDescription>
+												The width of the board ({SizeSchema.minValue} -{" "}
+												{SizeSchema.maxValue})
+											</FormDescription>
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={form.control}
+									name="height"
+									render={({ field }) => (
+										<FormItem className="grow">
+											<FormLabel>Height</FormLabel>
+											<FormControl>
+												<Input
+													{...field}
+													type="number"
+													min={SizeSchema.minValue!}
+													max={SizeSchema.maxValue!}
+												/>
+											</FormControl>
+											<FormDescription>
+												The height of the board ({SizeSchema.minValue} -{" "}
+												{SizeSchema.maxValue})
+											</FormDescription>
+										</FormItem>
+									)}
+								/>
+							</div>
+							<BoardIcon rows={height} columns={width} />
 						</div>
 					</CardContent>
 					<CardFooter>
-						<Button className="w-full" type="submit">
-							Create Game
+						<Button className="w-full gap-2" type="submit">
+							<PlusIcon filled />
+							<p>Create Game</p>
 						</Button>
 					</CardFooter>
 				</form>
@@ -223,7 +239,7 @@ function JoinGameCard() {
 										<Input {...field} />
 									</FormControl>
 									<FormDescription>
-										Your public display name ({UsernameSchema.minLength} -
+										Your public display name ({UsernameSchema.minLength} -{" "}
 										{UsernameSchema.maxLength} characters)
 									</FormDescription>
 								</FormItem>
@@ -231,8 +247,9 @@ function JoinGameCard() {
 						/>
 					</CardContent>
 					<CardFooter>
-						<Button className="w-full" type="submit">
-							Join Game
+						<Button className="w-full gap-2" type="submit">
+							<LoginIcon filled />
+							<p>Join Game</p>
 						</Button>
 					</CardFooter>
 				</form>
