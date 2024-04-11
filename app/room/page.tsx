@@ -10,17 +10,18 @@ import { LogoIcon } from "~/components/icons/logo";
 import { SettingsIcon } from "~/components/icons/settings";
 import { ThemeSwitcher } from "~/components/theme-switcher";
 import { Button } from "~/components/ui/button";
-import {
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogPortal,
-	DialogTitle,
-	DialogTrigger,
-} from "~/components/ui/dialog";
-import { Dialog, DialogHeader } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import {
+	Modal,
+	ModalContent,
+	ModalDescription,
+	ModalFooter,
+	ModalHeader,
+	ModalPortal,
+	ModalTitle,
+	ModalTrigger,
+} from "~/components/ui/modal";
 import {
 	Popover,
 	PopoverClose,
@@ -48,12 +49,12 @@ export default function RoomPage() {
 
 	return (
 		<div className="absolute top-1/2 left-1/2 flex w-fit translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6">
-			<Dialog open={hasGameEnded}>
-				<DialogPortal>
-					<DialogContent className="flex flex-col gap-6">
-						<DialogHeader>
-							<DialogTitle>You Win! 🎉</DialogTitle>
-						</DialogHeader>
+			<Modal open={hasGameEnded}>
+				<ModalPortal>
+					<ModalContent className="flex flex-col gap-6">
+						<ModalHeader>
+							<ModalTitle>You Win! 🎉</ModalTitle>
+						</ModalHeader>
 						<div className="flex flex-col gap-2">
 							<PlayerCard
 								name="WWWWWWWWWW"
@@ -75,36 +76,36 @@ export default function RoomPage() {
 								color="yellow"
 							/>
 						</div>
-						<DialogFooter>
+						<ModalFooter>
 							<Button className="w-full" variant="default">
 								Play Again
 							</Button>
-						</DialogFooter>
-					</DialogContent>
+						</ModalFooter>
+					</ModalContent>
 					<div className="absolute z-50">
 						<Confetti width={width} height={height} />
 					</div>
-				</DialogPortal>
-			</Dialog>
+				</ModalPortal>
+			</Modal>
 
 			<div className="flex w-full items-center justify-between">
 				<LogoIcon flat />
 				<div className="flex gap-2">
 					<ThemeSwitcher />
-					<Dialog>
-						<DialogTrigger asChild>
+					<Modal>
+						<ModalTrigger asChild>
 							<Button variant="secondary" size="icon" className="group">
 								<SettingsIcon className="group-hover:animate-spin" />
 							</Button>
-						</DialogTrigger>
-						<DialogPortal>
-							<DialogContent>
-								<DialogHeader>
-									<DialogTitle>Settings</DialogTitle>
-									<DialogDescription>
+						</ModalTrigger>
+						<ModalPortal>
+							<ModalContent>
+								<ModalHeader>
+									<ModalTitle>Settings</ModalTitle>
+									<ModalDescription>
 										Configure your room and game settings.
-									</DialogDescription>
-								</DialogHeader>
+									</ModalDescription>
+								</ModalHeader>
 								<div className="my-2 flex flex-col gap-4">
 									<div className="flex flex-col gap-2">
 										<Label htmlFor="username">Profile</Label>
@@ -144,9 +145,9 @@ export default function RoomPage() {
 										Leave Room
 									</Button>
 								</div>
-							</DialogContent>
-						</DialogPortal>
-					</Dialog>
+							</ModalContent>
+						</ModalPortal>
+					</Modal>
 				</div>
 			</div>
 			<Board width={5} height={5} board={createBoard(5, 5)} />
