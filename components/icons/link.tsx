@@ -20,6 +20,7 @@ export function LinkIcon({
 				className="stroke-current"
 				strokeWidth="1.5"
 				strokeLinecap="round"
+				initial={{ pathLength: 0, opacity: 0 }}
 				variants={animateVisibility}
 				animate={animate}
 			/>
@@ -28,6 +29,7 @@ export function LinkIcon({
 				className="stroke-current"
 				strokeWidth="1.5"
 				strokeLinecap="round"
+				initial={{ pathLength: 0, opacity: 0 }}
 				variants={animateVisibility}
 				animate={animate}
 			/>

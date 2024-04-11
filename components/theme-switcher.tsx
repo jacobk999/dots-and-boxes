@@ -32,16 +32,18 @@ export function ThemeSwitcher() {
 					{theme === "system" && <MonitorIcon filled />}
 				</Button>
 			</SelectTrigger>
-			<SelectContent className="flex flex-row gap-2">
-				<SelectItem value="light">
-					<SunIcon filled={theme === "light"} />
-				</SelectItem>
-				<SelectItem value="dark">
-					<MoonIcon filled={theme === "dark"} />
-				</SelectItem>
-				<SelectItem value="system">
-					<MonitorIcon filled={theme === "system"} />
-				</SelectItem>
+			<SelectContent>
+				<div className="flex flex-row gap-2">
+					<SelectItem value="light">
+						<SunIcon filled={theme === "light"} />
+					</SelectItem>
+					<SelectItem value="dark">
+						<MoonIcon filled={theme === "dark"} />
+					</SelectItem>
+					<SelectItem value="system">
+						<MonitorIcon filled={theme === "system"} />
+					</SelectItem>
+				</div>
 			</SelectContent>
 		</Select>
 	);

@@ -9,6 +9,7 @@ import { BoardIcon } from "~/components/icons/board";
 import { LoginIcon } from "~/components/icons/login";
 import { LogoIcon } from "~/components/icons/logo";
 import { PlusIcon } from "~/components/icons/plus";
+import { ThemeSwitcher } from "~/components/theme-switcher";
 import { Button } from "~/components/ui/button";
 import {
 	Card,
@@ -32,27 +33,32 @@ export default function Home() {
 	const [tab, setTab] = useState("create");
 
 	return (
-		<div className="absolute top-1/2 left-1/2 flex w-[95%] max-w-[700px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6">
-			<LogoIcon flat={false} />
-			<Tabs defaultValue="create" onValueChange={setTab} className="w-full">
-				<TabsList className="w-full">
-					<TabsTrigger value="create" className="grow gap-1">
-						<PlusIcon filled={tab === "create"} />
-						Create
-					</TabsTrigger>
-					<TabsTrigger value="join" className="grow gap-1">
-						<LoginIcon filled={tab === "join"} />
-						Join
-					</TabsTrigger>
-				</TabsList>
-				<TabsContent value="create" className="h-[600px]">
-					<CreateGameCard />
-				</TabsContent>
-				<TabsContent value="join" className="h-[600px]">
-					<JoinGameCard />
-				</TabsContent>
-			</Tabs>
-		</div>
+		<>
+			<div className="absolute top-1/2 left-1/2 flex w-[95%] max-w-[700px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6">
+				<LogoIcon flat={false} />
+				<Tabs defaultValue="create" onValueChange={setTab} className="w-full">
+					<TabsList className="w-full">
+						<TabsTrigger value="create" className="grow gap-1">
+							<PlusIcon filled={tab === "create"} />
+							Create
+						</TabsTrigger>
+						<TabsTrigger value="join" className="grow gap-1">
+							<LoginIcon filled={tab === "join"} />
+							Join
+						</TabsTrigger>
+					</TabsList>
+					<TabsContent value="create" className="h-[600px]">
+						<CreateGameCard />
+					</TabsContent>
+					<TabsContent value="join" className="h-[600px]">
+						<JoinGameCard />
+					</TabsContent>
+				</Tabs>
+			</div>
+			<div className="fixed right-4 bottom-4">
+				<ThemeSwitcher />
+			</div>
+		</>
 	);
 }
 

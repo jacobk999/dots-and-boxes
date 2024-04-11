@@ -21,6 +21,7 @@ export function CheckIcon({
 				strokeWidth="2"
 				strokeLinecap="round"
 				strokeLinejoin="round"
+				initial={{ pathLength: 0, opacity: 0 }}
 				variants={animateVisibility}
 				animate={animate}
 			/>
