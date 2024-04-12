@@ -1,5 +1,7 @@
 import { Fragment } from "react";
+import type { RoomDto } from "~/app/room/[id]/room";
 import { cn } from "~/lib/utils";
+import type { PlayerDto } from "./player";
 
 export enum Cell {
 	Empty = 0,
@@ -37,9 +39,83 @@ interface BoardProps {
 	width: number;
 	height: number;
 	board: BoardDto;
+	players: PlayerDto[];
+	player?: PlayerDto;
+	turnId: string;
+	mutateRoom: (room: Partial<RoomDto>) => void;
 }
 
-export function Board({ width, board }: BoardProps) {
+export function Board({
+	width,
+	board,
+	players,
+	player,
+	turnId,
+	mutateRoom,
+}: BoardProps) {
+	const turn = players.findIndex((p) => p.playerId === turnId);
+
+	function isBoxComplete(x: number, y: number) {
+		const top = board.horizontals[y]?.[x];
+		const bottom = board.horizontals[y + 1]?.[x];
+		const left = board.verticals[y]?.[x];
+		const right = board.verticals[y]?.[x + 1];
+
+		return top && bottom && left && right;
+	}
+
+	function setBox(x: number, y: number, value: Cell) {
+		board.boxes[y][x] = value;
+		mutateRoom({ board });
+	}
+
+	function setLine(x: number, y: number, orientation: Orientation) {
+		if (players[turn].playerId !== player?.playerId) return;
+
+		let hasCompletedBox = false;
+		const cell = player?.cell!;
+
+		if (orientation === Orientation.Vertical) {
+			if (board.verticals[y][x] !== Cell.Empty) return;
+
+			board.verticals[y][x] = cell;
+			mutateRoom({ board });
+
+			// Check if the box to the right is complete
+			if (isBoxComplete(x, y)) {
+				setBox(x, y, cell);
+				hasCompletedBox = true;
+			}
+
+			// Check if the box to the left is complete
+			if (isBoxComplete(x - 1, y)) {
+				setBox(x - 1, y, cell);
+				hasCompletedBox = true;
+			}
+		} else {
+			if (board.horizontals[y][x] !== Cell.Empty) return;
+
+			board.horizontals[y][x] = cell;
+			mutateRoom({ board });
+
+			// Check if the box below is complete
+			if (isBoxComplete(x, y)) {
+				setBox(x, y, cell);
+				hasCompletedBox = true;
+			}
+
+			// Check if the box above is complete
+			if (isBoxComplete(x, y - 1)) {
+				setBox(x, y - 1, cell);
+				hasCompletedBox = true;
+			}
+		}
+
+		if (!hasCompletedBox) {
+			mutateRoom({ turnId: players[(turn + 1) % players.length].playerId });
+		}
+	}
+
 	return (
 		<div
 			className="grid"
@@ -53,10 +129,8 @@ export function Board({ width, board }: BoardProps) {
 					{row.map((value, x) => (
 						<Fragment key={`frag-h-${x}-${y}`}>
 							<Line
-								x={x}
-								y={y}
 								value={value}
-								orientation={Orientation.Horizontal}
+								setLine={() => setLine(x, y, Orientation.Horizontal)}
 							/>
 							<Dot />
 						</Fragment>
@@ -64,10 +138,8 @@ export function Board({ width, board }: BoardProps) {
 					{board.verticals[y]?.map((value, x) => (
 						<Fragment key={`frag-v-${x}-${y}`}>
 							<Line
-								x={x}
-								y={y}
 								value={value}
-								orientation={Orientation.Vertical}
+								setLine={() => setLine(x, y, Orientation.Vertical)}
 							/>
 							{board.boxes[y]?.[x] !== undefined && (
 								<Box value={board.boxes[y][x]} />
@@ -124,20 +196,17 @@ const LineColor: Record<Cell, string> = {
 };
 
 function Line({
-	x,
-	y,
 	value,
-	orientation,
+	setLine,
 }: {
-	x: number;
-	y: number;
 	value: Cell;
-	orientation: Orientation;
+	setLine: () => void;
 }) {
 	return (
 		<button
 			type="button"
 			className={cn("z-40 transition-colors", LineColor[value])}
+			onClick={() => setLine()}
 		/>
 	);
 }

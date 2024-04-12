@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+import { type ElementRef, forwardRef } from "react";
 import { cn } from "~/lib/utils";
 import { Cell } from "./board";
 import { CrownIcon } from "./icons/crown";
@@ -15,36 +17,39 @@ interface PlayerCardProps {
 	winner?: boolean;
 }
 
-export function PlayerCard({ player, score, winner = false }: PlayerCardProps) {
-	return (
-		<div
-			className={cn(
-				"flex w-full flex-row rounded-md",
-				PlayerCardBackground[player.cell],
-			)}
-		>
+export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
+	({ player, score, winner = false }, ref) => {
+		return (
 			<div
+				ref={ref}
 				className={cn(
-					"flex grow flex-row items-center gap-1.5 rounded-r-lg rounded-l-md px-3 py-2",
-					PlayerNametagBackground[player.cell],
+					"flex w-full flex-row rounded-md",
+					PlayerCardBackground[player.cell],
 				)}
 			>
-				<div className="relative flex h-8 w-8 items-center justify-center rounded-[50px] bg-white/30 text-xl dark:bg-black/30">
-					{winner && (
-						<div className="absolute top-[-10px] text-yellow-500">
-							<CrownIcon filled />
-						</div>
+				<div
+					className={cn(
+						"flex grow flex-row items-center gap-1.5 rounded-r-lg rounded-l-md px-3 py-2",
+						PlayerNametagBackground[player.cell],
 					)}
-					{player.emoji}
+				>
+					<div className="relative flex h-8 w-8 items-center justify-center rounded-[50px] bg-white/30 text-xl dark:bg-black/30">
+						{winner && (
+							<div className="absolute top-[-10px] text-yellow-500">
+								<CrownIcon filled />
+							</div>
+						)}
+						{player.emoji}
+					</div>
+					<p className="font-semibold">{player.username}</p>
 				</div>
-				<p className="font-semibold">{player.username}</p>
+				<div className="flex w-10 items-center justify-center font-extrabold">
+					<p>{score}</p>
+				</div>
 			</div>
-			<div className="flex w-10 items-center justify-center font-extrabold">
-				<p>{score}</p>
-			</div>
-		</div>
-	);
-}
+		);
+	},
+);
 
 const PlayerCardBackground: Record<Cell, string> = {
 	[Cell.Empty]: "bg-background",

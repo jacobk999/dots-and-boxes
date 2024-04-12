@@ -21,6 +21,7 @@ export async function createRoom({
 		roomId,
 		roomName,
 		ownerId,
+		turnId: ownerId,
 
 		board: createBoard(width, height),
 		players: [
