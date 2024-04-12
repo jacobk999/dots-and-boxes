@@ -38,11 +38,11 @@ export default function Home() {
 				<LogoIcon flat={false} />
 				<Tabs defaultValue="create" onValueChange={setTab} className="w-full">
 					<TabsList className="w-full">
-						<TabsTrigger value="create" className="grow gap-1">
+						<TabsTrigger value="create">
 							<PlusIcon filled={tab === "create"} />
 							Create
 						</TabsTrigger>
-						<TabsTrigger value="join" className="grow gap-1">
+						<TabsTrigger value="join">
 							<LoginIcon filled={tab === "join"} />
 							Join
 						</TabsTrigger>
