@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { cn } from "~/lib/utils";
 
-enum Cell {
+export enum Cell {
 	Empty = 0,
 	Player1 = 1,
 	Player2 = 2,
@@ -13,13 +13,13 @@ enum Cell {
 	Player8 = 8,
 }
 
-type Board = {
+export type BoardDto = {
 	horizontals: Cell[][];
 	verticals: Cell[][];
 	boxes: Cell[][];
 };
 
-export function createBoard(width: number, height: number): Board {
+export function createBoard(width: number, height: number): BoardDto {
 	return {
 		boxes: createGrid(width, height),
 		horizontals: createGrid(width, height + 1),
@@ -36,7 +36,7 @@ function createGrid(width: number, height: number) {
 interface BoardProps {
 	width: number;
 	height: number;
-	board: Board;
+	board: BoardDto;
 }
 
 export function Board({ width, board }: BoardProps) {

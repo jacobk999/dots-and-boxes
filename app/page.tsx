@@ -1,10 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
 import { BoardIcon } from "~/components/icons/board";
 import { LoginIcon } from "~/components/icons/login";
 import { LogoIcon } from "~/components/icons/logo";
@@ -28,15 +28,28 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { createRoom, joinRoom } from "./actions";
+import {
+	CreateGameSchema,
+	JoinGameSchema,
+	SIZE_DEFAULT,
+	SizeSchema,
+	UsernameSchema,
+} from "./validation";
 
 export default function Home() {
 	const [tab, setTab] = useState("create");
+	const searchParams = useSearchParams();
 
 	return (
 		<>
 			<div className="absolute top-1/2 left-1/2 flex w-[95%] max-w-[700px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6">
 				<LogoIcon flat={false} />
-				<Tabs defaultValue="create" onValueChange={setTab} className="w-full">
+				<Tabs
+					defaultValue={searchParams.has("room") ? "join" : "create"}
+					onValueChange={setTab}
+					className="w-full"
+				>
 					<TabsList className="w-full">
 						<TabsTrigger value="create">
 							<PlusIcon filled={tab === "create"} />
@@ -62,20 +75,10 @@ export default function Home() {
 	);
 }
 
-const SIZE_DEFAULT = 5;
-
-const RoomNameSchema = z.string().min(3).max(16);
-const UsernameSchema = z.string().min(3).max(8);
-const SizeSchema = z.coerce.number().min(3).max(11);
-
-const CreateGameSchema = z.object({
-	roomName: RoomNameSchema,
-	username: UsernameSchema,
-	width: SizeSchema,
-	height: SizeSchema,
-});
-
 function CreateGameCard() {
+	const [isPending, startTransition] = useTransition();
+	const router = useRouter();
+
 	const form = useForm<z.infer<typeof CreateGameSchema>>({
 		resolver: zodResolver(CreateGameSchema),
 		defaultValues: {
@@ -94,11 +97,12 @@ function CreateGameCard() {
 		SizeSchema.minValue!,
 	);
 
-	const router = useRouter();
-
-	async function onSubmit(values: z.infer<typeof CreateGameSchema>) {
-		alert(JSON.stringify(values, null, 2));
-		router.push("/room");
+	function onSubmit(values: z.infer<typeof CreateGameSchema>) {
+		startTransition(async () => {
+			const { roomId, playerId } = await createRoom(values);
+			sessionStorage.setItem(roomId, playerId);
+			router.push(`/room/${roomId}`);
+		});
 	}
 
 	return (
@@ -187,7 +191,7 @@ function CreateGameCard() {
 						</div>
 					</CardContent>
 					<CardFooter>
-						<Button className="w-full gap-2" type="submit">
+						<Button className="w-full gap-2" type="submit" disabled={isPending}>
 							<PlusIcon filled />
 							Create Game
 						</Button>
@@ -197,21 +201,25 @@ function CreateGameCard() {
 		</Card>
 	);
 }
-const JoinGameSchema = z.object({
-	roomName: RoomNameSchema,
-	username: UsernameSchema,
-});
 
 function JoinGameCard() {
-	const form = useForm<z.infer<typeof JoinGameSchema>>({
-		resolver: zodResolver(JoinGameSchema),
-	});
-
+	const [isPending, startTransition] = useTransition();
+	const searchParams = useSearchParams();
 	const router = useRouter();
 
+	const form = useForm<z.infer<typeof JoinGameSchema>>({
+		resolver: zodResolver(JoinGameSchema),
+		defaultValues: {
+			roomName: searchParams.get("room") ?? "",
+		},
+	});
+
 	async function onSubmit(values: z.infer<typeof JoinGameSchema>) {
-		alert(JSON.stringify(values, null, 2));
-		router.push("/room");
+		startTransition(async () => {
+			const { roomId, playerId } = await joinRoom(values);
+			sessionStorage.setItem(roomId, playerId);
+			router.push(`/room/${roomId}`);
+		});
 	}
 
 	return (
@@ -253,7 +261,7 @@ function JoinGameCard() {
 						/>
 					</CardContent>
 					<CardFooter>
-						<Button className="w-full gap-2" type="submit">
+						<Button className="w-full gap-2" type="submit" disabled={isPending}>
 							<LoginIcon filled />
 							Join Game
 						</Button>

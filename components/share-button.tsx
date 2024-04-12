@@ -23,7 +23,9 @@ export function ShareButton({ link }: ShareButtonProps) {
 			variant="link"
 			size="icon"
 			onClick={() => {
-				navigator.clipboard.writeText(link ?? window.location.href);
+				navigator.clipboard.writeText(
+					link ? `${window.location.origin}${link}` : window.location.href,
+				);
 				setCopied(true);
 			}}
 		>

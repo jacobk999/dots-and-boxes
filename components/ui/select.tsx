@@ -1,19 +1,22 @@
 "use client";
 
 import * as SelectPrimitive from "@radix-ui/react-select";
-import * as React from "react";
-// import { Check, ChevronDown, ChevronUp } from "lucide-react"
+import {
+	type ComponentPropsWithoutRef,
+	type ElementRef,
+	forwardRef,
+} from "react";
 
 import { cn } from "~/lib/utils";
 
-const Select = SelectPrimitive.Root;
-const SelectGroup = SelectPrimitive.Group;
-const SelectValue = SelectPrimitive.Value;
-const SelectTrigger = SelectPrimitive.Trigger;
+export const Select = SelectPrimitive.Root;
+export const SelectGroup = SelectPrimitive.Group;
+export const SelectValue = SelectPrimitive.Value;
+export const SelectTrigger = SelectPrimitive.Trigger;
 
-const SelectContent = React.forwardRef<
-	React.ElementRef<typeof SelectPrimitive.Content>,
-	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
+export const SelectContent = forwardRef<
+	ElementRef<typeof SelectPrimitive.Content>,
+	ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
 >(({ className, children, position = "popper", ...props }, ref) => (
 	<SelectPrimitive.Portal>
 		<SelectPrimitive.Content
@@ -33,9 +36,9 @@ const SelectContent = React.forwardRef<
 ));
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
-const SelectItem = React.forwardRef<
-	React.ElementRef<typeof SelectPrimitive.Item>,
-	React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
+export const SelectItem = forwardRef<
+	ElementRef<typeof SelectPrimitive.Item>,
+	ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
 >(({ className, children, ...props }, ref) => (
 	<SelectPrimitive.Item
 		ref={ref}
@@ -48,13 +51,5 @@ const SelectItem = React.forwardRef<
 		{children}
 	</SelectPrimitive.Item>
 ));
-SelectItem.displayName = SelectPrimitive.Item.displayName;
 
-export {
-	Select,
-	SelectGroup,
-	SelectValue,
-	SelectTrigger,
-	SelectContent,
-	SelectItem,
-};
+SelectItem.displayName = SelectPrimitive.Item.displayName;
