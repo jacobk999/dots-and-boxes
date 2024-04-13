@@ -66,7 +66,7 @@ export default function Home() {
 						<CreateGameCard />
 					</TabsContent>
 					<TabsContent value="join" className="h-[600px]">
-						<JoinGameCard roomName={roomName} />
+						<JoinGameCard roomName={roomName ?? undefined} />
 					</TabsContent>
 				</Tabs>
 			</div>
