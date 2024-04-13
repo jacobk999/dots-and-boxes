@@ -2,18 +2,24 @@
 
 import { randomUUID } from "node:crypto";
 import type { z } from "zod";
-import { Cell, createBoard } from "~/components/board";
 import { emojis } from "~/components/emoji-picker";
+import { Cell, createBoard } from "~/lib/board";
 import { supabase } from "~/lib/supabase";
 import type { RoomDto } from "./room/[id]/room";
-import type { CreateGameSchema, JoinGameSchema } from "./validation";
+import {
+	type CreateGameSchema,
+	Errors,
+	type JoinGameSchema,
+} from "./validation";
 
 export async function createRoom({
 	roomName,
 	username,
 	width,
 	height,
-}: z.infer<typeof CreateGameSchema>) {
+}: z.infer<typeof CreateGameSchema>): Promise<
+	{ roomId: string; playerId: string } | { error: string }
+> {
 	const roomId = randomUUID();
 	const ownerId = randomUUID();
 
@@ -34,10 +40,19 @@ export async function createRoom({
 		],
 
 		started: false,
-		ended: false,
 	};
 
-	await supabase.from("rooms").insert(room);
+	const { error } = await supabase.from("rooms").insert(room);
+
+	if (error) {
+		if (
+			error.message.startsWith("duplicate key value violates unique constraint")
+		) {
+			return { error: Errors.ROOM_NAME_TAKEN };
+		}
+
+		return { error: Errors.SUPABASE_ERROR };
+	}
 
 	return { roomId, playerId: ownerId };
 }
@@ -45,23 +60,24 @@ export async function createRoom({
 export async function joinRoom({
 	roomName,
 	username,
-}: z.infer<typeof JoinGameSchema>) {
+}: z.infer<typeof JoinGameSchema>): Promise<
+	{ roomId: string; playerId: string } | { error: string }
+> {
 	const { data: room, error } = await supabase
 		.from("rooms")
-		.select("roomId, players")
+		.select("roomId, players, started")
 		.match({ roomName })
 		.single();
 
-	if (error || !room) {
-		throw new Error("Room not found");
-	}
-
-	const playerId = randomUUID();
+	if (!room) return { error: Errors.ROOM_NOT_FOUND };
+	if (error) return { error: Errors.SUPABASE_ERROR };
+	if (room.started) return { error: Errors.ROOM_STARTED };
 
 	const players = room.players as RoomDto["players"];
 
-	if (players.length >= 8) throw new Error("Room is full");
+	if (players.length >= 8) return { error: Errors.ROOM_FULL };
 
+	const playerId = randomUUID();
 	const cell = Cell[`Player${players.length + 1}` as keyof typeof Cell];
 	players.push({ playerId, username, emoji: randomEmoji(), cell });
 

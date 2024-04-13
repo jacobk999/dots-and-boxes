@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import type { z } from "zod";
 import { BoardIcon } from "~/components/icons/board";
 import { LoginIcon } from "~/components/icons/login";
@@ -31,6 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { createRoom, joinRoom } from "./actions";
 import {
 	CreateGameSchema,
+	Errors,
 	JoinGameSchema,
 	SIZE_DEFAULT,
 	SizeSchema,
@@ -106,9 +108,31 @@ function CreateGameCard() {
 
 	function onSubmit(values: z.infer<typeof CreateGameSchema>) {
 		startTransition(async () => {
-			const { roomId, playerId } = await createRoom(values);
-			sessionStorage.setItem(roomId, playerId);
-			router.push(`/room/${roomId}`);
+			const result = await createRoom(values);
+
+			if ("error" in result) {
+				switch (result.error) {
+					case Errors.ROOM_NAME_TAKEN:
+						form.setError("roomName", { message: Errors.ROOM_NAME_TAKEN });
+						toast.error(`The room name '${values.roomName}' is already taken`, {
+							position: "bottom-left",
+						});
+
+						break;
+					case Errors.SUPABASE_ERROR:
+						toast.error(
+							"An internal server error occurred while creating the room",
+							{ position: "bottom-left" },
+						);
+
+						break;
+				}
+
+				return;
+			}
+
+			sessionStorage.setItem(result.roomId, result.playerId);
+			router.push(`/room/${result.roomId}`);
 		});
 	}
 
@@ -220,9 +244,43 @@ function JoinGameCard({ roomName }: { roomName?: string }) {
 
 	async function onSubmit(values: z.infer<typeof JoinGameSchema>) {
 		startTransition(async () => {
-			const { roomId, playerId } = await joinRoom(values);
-			sessionStorage.setItem(roomId, playerId);
-			router.push(`/room/${roomId}`);
+			const result = await joinRoom(values);
+
+			if ("error" in result) {
+				switch (result.error) {
+					case Errors.ROOM_FULL:
+						toast.error(`The room '${values.roomName}' is already full`, {
+							position: "bottom-left",
+						});
+
+						break;
+
+					case Errors.ROOM_NOT_FOUND:
+						toast.error(`The room '${values.roomName}' could not be found`, {
+							position: "bottom-left",
+						});
+						break;
+
+					case Errors.ROOM_STARTED:
+						toast.error(`The room '${values.roomName}' has already started`, {
+							position: "bottom-left",
+						});
+						break;
+
+					case Errors.SUPABASE_ERROR:
+						toast.error(
+							"An internal server error occurred while creating the room",
+							{ position: "bottom-left" },
+						);
+
+						break;
+				}
+
+				return;
+			}
+
+			sessionStorage.setItem(result.roomId, result.playerId);
+			router.push(`/room/${result.roomId}`);
 		});
 	}
 

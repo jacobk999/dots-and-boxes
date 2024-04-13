@@ -1,39 +1,23 @@
-import { Fragment } from "react";
+"use client";
+
+import {
+	motion,
+	useAnimation,
+	useMotionTemplate,
+	useMotionValue,
+} from "framer-motion";
+import { Fragment, useEffect, useState } from "react";
 import type { RoomDto } from "~/app/room/[id]/room";
 import { cn } from "~/lib/utils";
+import { Cell } from "../lib/board";
 import type { PlayerDto } from "./player";
-
-export enum Cell {
-	Empty = 0,
-	Player1 = 1,
-	Player2 = 2,
-	Player3 = 3,
-	Player4 = 4,
-	Player5 = 5,
-	Player6 = 6,
-	Player7 = 7,
-	Player8 = 8,
-}
 
 export type BoardDto = {
 	horizontals: Cell[][];
 	verticals: Cell[][];
 	boxes: Cell[][];
+	lastMove?: { x: number; y: number; orientation: Orientation };
 };
-
-export function createBoard(width: number, height: number): BoardDto {
-	return {
-		boxes: createGrid(width, height),
-		horizontals: createGrid(width, height + 1),
-		verticals: createGrid(width + 1, height),
-	};
-}
-
-function createGrid(width: number, height: number) {
-	return Array.from({ length: height }, () =>
-		Array.from({ length: width }, () => Cell.Empty),
-	);
-}
 
 interface BoardProps {
 	width: number;
@@ -79,6 +63,7 @@ export function Board({
 			if (board.verticals[y][x] !== Cell.Empty) return;
 
 			board.verticals[y][x] = cell;
+			board.lastMove = { x, y, orientation };
 			mutateRoom({ board });
 
 			// Check if the box to the right is complete
@@ -96,6 +81,7 @@ export function Board({
 			if (board.horizontals[y][x] !== Cell.Empty) return;
 
 			board.horizontals[y][x] = cell;
+			board.lastMove = { x, y, orientation };
 			mutateRoom({ board });
 
 			// Check if the box below is complete
@@ -131,6 +117,11 @@ export function Board({
 							<Line
 								value={value}
 								setLine={() => setLine(x, y, Orientation.Horizontal)}
+								lastMove={
+									board.lastMove?.x === x &&
+									board.lastMove?.y === y &&
+									board.lastMove?.orientation === Orientation.Horizontal
+								}
 							/>
 							<Dot />
 						</Fragment>
@@ -140,6 +131,11 @@ export function Board({
 							<Line
 								value={value}
 								setLine={() => setLine(x, y, Orientation.Vertical)}
+								lastMove={
+									board.lastMove?.x === x &&
+									board.lastMove?.y === y &&
+									board.lastMove?.orientation === Orientation.Vertical
+								}
 							/>
 							{board.boxes[y]?.[x] !== undefined && (
 								<Box value={board.boxes[y][x]} />
@@ -152,21 +148,23 @@ export function Board({
 	);
 }
 
-const BoxColor: Record<Cell, string> = {
-	[Cell.Empty]: "bg-background",
-	[Cell.Player1]: "bg-red/75",
-	[Cell.Player2]: "bg-blue/75",
-	[Cell.Player3]: "bg-green/75",
-	[Cell.Player4]: "bg-yellow/75",
-	[Cell.Player5]: "bg-orange/75",
-	[Cell.Player6]: "bg-indigo/75",
-	[Cell.Player7]: "bg-purple/75",
-	[Cell.Player8]: "bg-pink/75",
-};
-
 function Box({ value }: { value: Cell }) {
+	const color = value === Cell.Empty ? "background" : PlayerColor[value];
+
 	return (
-		<div className={cn("relative aspect-square scale-105", BoxColor[value])} />
+		<motion.div
+			className={cn("relative aspect-square scale-105")}
+			variants={{
+				initial: {
+					background: `radial-gradient(circle, hsl(var(--${color}) / 0.75) 0%, hsl(var(--background)) 0%)`,
+				},
+				filled: {
+					background: `radial-gradient(circle, hsl(var(--${color}) / 0.75) 100%, hsl(var(--background)) 100%)`,
+				},
+			}}
+			transition={{ type: "spring", duration: 0.65, delay: 0.15 }}
+			animate={value === Cell.Empty ? "initial" : "filled"}
+		/>
 	);
 }
 
@@ -183,30 +181,53 @@ enum Orientation {
 	Vertical = 1,
 }
 
-const LineColor: Record<Cell, string> = {
-	[Cell.Empty]: "bg-accent hover:bg-accent/70 disabled:pointer-events-none",
-	[Cell.Player1]: "bg-red pointer-events-none",
-	[Cell.Player2]: "bg-blue pointer-events-none",
-	[Cell.Player3]: "bg-green pointer-events-none",
-	[Cell.Player4]: "bg-yellow pointer-events-none",
-	[Cell.Player5]: "bg-orange pointer-events-none",
-	[Cell.Player6]: "bg-indigo pointer-events-none",
-	[Cell.Player7]: "bg-purple pointer-events-none",
-	[Cell.Player8]: "bg-pink pointer-events-none",
+const PlayerColor: Record<Cell, string> = {
+	[Cell.Empty]: "accent",
+	[Cell.Player1]: "red",
+	[Cell.Player2]: "blue",
+	[Cell.Player3]: "green",
+	[Cell.Player4]: "yellow",
+	[Cell.Player5]: "orange",
+	[Cell.Player6]: "indigo",
+	[Cell.Player7]: "purple",
+	[Cell.Player8]: "pink",
 };
 
 function Line({
 	value,
+	lastMove,
 	setLine,
 }: {
 	value: Cell;
+	lastMove?: boolean;
 	setLine: () => void;
 }) {
+	const color = PlayerColor[value];
+
 	return (
-		<button
+		<motion.button
 			type="button"
-			className={cn("z-40 transition-colors", LineColor[value])}
+			className={cn(
+				"z-40 transition-colors disabled:pointer-events-none",
+				value !== Cell.Empty && "pointer-events-none",
+				lastMove && "animate-darken",
+			)}
+			variants={{
+				initial: {
+					background: `radial-gradient(circle, hsl(var(--${color})) 0%, hsl(var(--accent)) 0%)`,
+				},
+				filled: {
+					background: `radial-gradient(circle, hsl(var(--${color})) 100%, hsl(var(--accent)) 100%)`,
+				},
+			}}
+			animate={value === Cell.Empty ? "initial" : "filled"}
+			transition={{
+				type: "spring",
+				duration: 0.45,
+			}}
 			onClick={() => setLine()}
-		/>
+		>
+			<span className="sr-only">Line - {value}</span>
+		</motion.button>
 	);
 }

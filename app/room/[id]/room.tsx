@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
-import { Board, type BoardDto, Cell } from "~/components/board";
+import { Board, type BoardDto } from "~/components/board";
 import { Confetti } from "~/components/confetti";
 import { LogoIcon } from "~/components/icons/logo";
 import { PlayerCard, type PlayerDto } from "~/components/player";
@@ -17,6 +17,7 @@ import {
 	ModalPortal,
 	ModalTitle,
 } from "~/components/ui/modal";
+import { Cell, createBoard } from "~/lib/board";
 import { supabase } from "~/lib/supabase";
 import { Settings } from "./settings";
 
@@ -30,7 +31,6 @@ export interface RoomDto {
 
 	ownerId: string;
 	started: boolean;
-	ended: boolean;
 }
 
 function useRoom(initialRoom: RoomDto) {
@@ -111,6 +111,9 @@ function calculateScores(players: PlayerDto[], boxes: Cell[][]) {
 
 	for (const player of players) cells.set(player.cell, player.playerId);
 
+	let maxScore = 0;
+	let maxPlayerId = undefined;
+
 	for (const row of boxes) {
 		for (const cell of row) {
 			if (cell === Cell.Empty) continue;
@@ -118,10 +121,15 @@ function calculateScores(players: PlayerDto[], boxes: Cell[][]) {
 			if (!playerId) continue;
 			const score = (scores.get(playerId) || 0) + 1;
 			scores.set(playerId, score);
+
+			if (score > maxScore) {
+				maxScore = score;
+				maxPlayerId = playerId;
+			}
 		}
 	}
 
-	return scores;
+	return { scores, winnerId: maxPlayerId };
 }
 
 const MotionPlayerCard = motion(PlayerCard);
@@ -130,7 +138,9 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 	const { room, mutateRoom } = useRoom(initialRoom);
 	const { player, mutatePlayer } = usePlayer(room, mutateRoom);
 
-	const scores = useMemo(
+	const canStart = player?.playerId === room.ownerId && room.players.length > 1;
+
+	const { scores, winnerId } = useMemo(
 		() => calculateScores(room.players, room.board.boxes),
 		[room.board.boxes, room.players],
 	);
@@ -163,11 +173,24 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 				turnId={room.turnId}
 				mutateRoom={mutateRoom}
 			/>
-			<div className="flex w-full flex-row gap-2">
-				<Button className="grow">Start Game</Button>
-				<ShareButton link={`/?room=${initialRoom.roomName}`} />
-			</div>
-			<div className="grid w-full grid-cols-2 gap-2">
+			{!room.started && (
+				<div className="flex w-full flex-row gap-2">
+					<Button
+						className="grow"
+						disabled={!canStart}
+						onClick={() => {
+							console.log(canStart);
+							if (!canStart) return;
+							mutateRoom({ started: true });
+						}}
+					>
+						Start Game
+					</Button>
+					<ShareButton link={`/?room=${initialRoom.roomName}`} />
+				</div>
+			)}
+
+			<div className="grid w-full grid-cols-2 gap-3">
 				{[...room.players]
 					.sort(
 						(a, b) =>
@@ -179,31 +202,47 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 							player={player}
 							score={scores.get(player.playerId) ?? 0}
 							winner={index === 0}
+							isTurn={room.started && room.turnId === player.playerId}
 							layout
 							transition={{ type: "spring", damping: 25, stiffness: 120 }}
 						/>
 					))}
 			</div>
-			<GameFinishedModal open={gameFinishsed} room={room} scores={scores} />
+			<GameFinishedModal
+				open={gameFinishsed}
+				room={room}
+				mutateRoom={mutateRoom}
+				player={player}
+				scores={scores}
+				winnerId={winnerId!}
+			/>
 		</div>
 	);
 }
 
 function GameFinishedModal({
 	room,
+	mutateRoom,
+	player,
 	scores,
 	open,
+	winnerId,
 }: {
 	open: boolean;
 	room: RoomDto;
+	mutateRoom: (room: Partial<RoomDto>) => void;
+	player?: PlayerDto;
 	scores: Map<string, number>;
+	winnerId: string;
 }) {
+	const isWinner = winnerId === player?.playerId;
+
 	return (
 		<Modal open={open}>
 			<ModalPortal>
 				<ModalContent className="flex flex-col gap-6">
 					<ModalHeader>
-						<ModalTitle>You Win! 🎉</ModalTitle>
+						<ModalTitle>{isWinner ? "You Win! 🎉" : "You Lose 😓"}</ModalTitle>
 					</ModalHeader>
 					<div className="flex flex-col gap-2">
 						{[...room.players]
@@ -221,7 +260,20 @@ function GameFinishedModal({
 							))}
 					</div>
 					<ModalFooter>
-						<Button className="w-full" variant="default">
+						<Button
+							className="w-full"
+							variant="default"
+							onClick={() => {
+								mutateRoom({
+									board: createBoard(
+										room.board.boxes[0].length,
+										room.board.boxes.length,
+									),
+									turnId: room.ownerId,
+									started: false,
+								});
+							}}
+						>
 							Play Again
 						</Button>
 					</ModalFooter>

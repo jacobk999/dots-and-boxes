@@ -26,10 +26,16 @@ export function ThemeSwitcher() {
 	return (
 		<Select value={theme} onValueChange={setTheme}>
 			<SelectTrigger asChild>
-				<Button variant="secondary" size="icon">
+				<Button
+					variant="secondary"
+					size="icon"
+					type="button"
+					name="Theme Switcher"
+				>
 					{theme === "light" && <SunIcon filled />}
 					{theme === "dark" && <MoonIcon filled />}
 					{theme === "system" && <MonitorIcon filled />}
+					<span className="sr-only">Theme is currently set to {theme}</span>
 				</Button>
 			</SelectTrigger>
 			<SelectContent>

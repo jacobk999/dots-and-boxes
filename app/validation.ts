@@ -22,3 +22,11 @@ export const SettingsSchema = z.object({
 	username: UsernameSchema,
 	emoji: z.string(),
 });
+
+export const Errors = {
+	ROOM_NOT_FOUND: "Room not found",
+	ROOM_FULL: "Room is full",
+	ROOM_STARTED: "Room has already started",
+	ROOM_NAME_TAKEN: "Room name is already taken",
+	SUPABASE_ERROR: "Supabase error",
+};

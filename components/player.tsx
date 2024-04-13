@@ -1,7 +1,6 @@
-import { motion } from "framer-motion";
-import { type ElementRef, forwardRef } from "react";
+import { forwardRef } from "react";
 import { cn } from "~/lib/utils";
-import { Cell } from "./board";
+import { Cell } from "../lib/board";
 import { CrownIcon } from "./icons/crown";
 
 export interface PlayerDto {
@@ -15,16 +14,18 @@ interface PlayerCardProps {
 	player: PlayerDto;
 	score: number;
 	winner?: boolean;
+	isTurn?: boolean;
 }
 
 export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
-	({ player, score, winner = false }, ref) => {
+	({ player, score, winner = false, isTurn = false }, ref) => {
 		return (
 			<div
 				ref={ref}
 				className={cn(
 					"flex w-full flex-row rounded-md",
 					PlayerCardBackground[player.cell],
+					isTurn && "animate-bounce",
 				)}
 			>
 				<div

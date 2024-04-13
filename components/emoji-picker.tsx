@@ -32,6 +32,7 @@ export function EmojiPicker({ emoji, onEmojiChange }: EmojiPickerProps) {
 								onClick={() => onEmojiChange?.(emoji)}
 							>
 								{emoji}
+								<span className="sr-only">Select {emoji}</span>
 							</Button>
 						</PopoverClose>
 					))}

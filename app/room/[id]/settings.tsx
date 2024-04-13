@@ -62,6 +62,7 @@ export function Settings({ player, mutatePlayer }: SettingsProps) {
 			<ModalTrigger asChild>
 				<Button variant="secondary" size="icon" className="group">
 					<SettingsIcon className="group-hover:animate-spin" />
+					<span className="sr-only">Settings</span>
 				</Button>
 			</ModalTrigger>
 			<ModalContent>

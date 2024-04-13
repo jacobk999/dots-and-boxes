@@ -109,10 +109,25 @@ const config = {
 					from: { height: "var(--radix-accordion-content-height)" },
 					to: { height: "0" },
 				},
+				darken: {
+					"0%": { filter: "brightness(1)" },
+					"50%": { filter: "brightness(0.5)" },
+					"100%": { filter: "brightness(1)" },
+				},
+				bounce: {
+					"0%, 100%": {
+						transform: "translateY(-15%)",
+						"animation-timing-function": "cubic-bezier(.98,1.39,.83,1.12)",
+					},
+					"50%": {
+						transform: "none",
+					},
+				},
 			},
 			animation: {
 				"accordion-down": "accordion-down 0.2s ease-out",
 				"accordion-up": "accordion-up 0.2s ease-out",
+				darken: "darken 2s ease-out infinite",
 			},
 			fontFamily: {
 				sans: ["var(--font-sans)", ...fontFamily.sans],
