@@ -38,42 +38,47 @@ import {
 } from "./validation";
 
 export default function Home() {
-	const [tab, setTab] = useState("create");
-	const searchParams = useSearchParams();
-
-	const roomName = searchParams.get("room");
-
 	return (
 		<Suspense>
 			<div className="absolute top-1/2 left-1/2 flex w-[95%] max-w-[700px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6">
 				<LogoIcon flat={false} />
-				<Tabs
-					defaultValue={roomName ? "join" : "create"}
-					onValueChange={setTab}
-					className="w-full"
-				>
-					<TabsList className="w-full">
-						<TabsTrigger value="create">
-							<PlusIcon filled={tab === "create"} />
-							Create
-						</TabsTrigger>
-						<TabsTrigger value="join">
-							<LoginIcon filled={tab === "join"} />
-							Join
-						</TabsTrigger>
-					</TabsList>
-					<TabsContent value="create" className="h-[600px]">
-						<CreateGameCard />
-					</TabsContent>
-					<TabsContent value="join" className="h-[600px]">
-						<JoinGameCard roomName={roomName ?? undefined} />
-					</TabsContent>
-				</Tabs>
+				<HomePageTabs />
 			</div>
 			<div className="fixed right-4 bottom-4">
 				<ThemeSwitcher />
 			</div>
 		</Suspense>
+	);
+}
+
+function HomePageTabs() {
+	const [tab, setTab] = useState("create");
+	const searchParams = useSearchParams();
+	const roomName = searchParams.get("room");
+
+	return (
+		<Tabs
+			defaultValue={roomName ? "join" : "create"}
+			onValueChange={setTab}
+			className="w-full"
+		>
+			<TabsList className="w-full">
+				<TabsTrigger value="create">
+					<PlusIcon filled={tab === "create"} />
+					Create
+				</TabsTrigger>
+				<TabsTrigger value="join">
+					<LoginIcon filled={tab === "join"} />
+					Join
+				</TabsTrigger>
+			</TabsList>
+			<TabsContent value="create" className="h-[600px]">
+				<CreateGameCard />
+			</TabsContent>
+			<TabsContent value="join" className="h-[600px]">
+				<JoinGameCard roomName={roomName ?? undefined} />
+			</TabsContent>
+		</Tabs>
 	);
 }
 
