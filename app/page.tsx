@@ -30,8 +30,8 @@ import { Input } from "~/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { createRoom, joinRoom } from "./actions";
 import {
-	type CreateGameSchema,
-	type JoinGameSchema,
+	CreateGameSchema,
+	JoinGameSchema,
 	SIZE_DEFAULT,
 	SizeSchema,
 	UsernameSchema,
