@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { Suspense, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import { BoardIcon } from "~/components/icons/board";
@@ -30,8 +30,8 @@ import { Input } from "~/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { createRoom, joinRoom } from "./actions";
 import {
-	CreateGameSchema,
-	JoinGameSchema,
+	type CreateGameSchema,
+	type JoinGameSchema,
 	SIZE_DEFAULT,
 	SizeSchema,
 	UsernameSchema,
@@ -41,12 +41,14 @@ export default function Home() {
 	const [tab, setTab] = useState("create");
 	const searchParams = useSearchParams();
 
+	const roomName = searchParams.get("room");
+
 	return (
-		<>
+		<Suspense>
 			<div className="absolute top-1/2 left-1/2 flex w-[95%] max-w-[700px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6">
 				<LogoIcon flat={false} />
 				<Tabs
-					defaultValue={searchParams.has("room") ? "join" : "create"}
+					defaultValue={roomName ? "join" : "create"}
 					onValueChange={setTab}
 					className="w-full"
 				>
@@ -64,14 +66,14 @@ export default function Home() {
 						<CreateGameCard />
 					</TabsContent>
 					<TabsContent value="join" className="h-[600px]">
-						<JoinGameCard />
+						<JoinGameCard roomName={roomName} />
 					</TabsContent>
 				</Tabs>
 			</div>
 			<div className="fixed right-4 bottom-4">
 				<ThemeSwitcher />
 			</div>
-		</>
+		</Suspense>
 	);
 }
 
@@ -202,16 +204,13 @@ function CreateGameCard() {
 	);
 }
 
-function JoinGameCard() {
+function JoinGameCard({ roomName }: { roomName?: string }) {
 	const [isPending, startTransition] = useTransition();
-	const searchParams = useSearchParams();
 	const router = useRouter();
 
 	const form = useForm<z.infer<typeof JoinGameSchema>>({
 		resolver: zodResolver(JoinGameSchema),
-		defaultValues: {
-			roomName: searchParams.get("room") ?? "",
-		},
+		defaultValues: { roomName },
 	});
 
 	async function onSubmit(values: z.infer<typeof JoinGameSchema>) {
