@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { Board, type BoardDto } from "~/components/board";
 import { Confetti } from "~/components/confetti";
@@ -107,9 +107,9 @@ function usePlayer(
 
 function calculateScores(players: PlayerDto[], boxes: Cell[][]) {
 	const cells = new Map<Cell, string>();
-	const scores = new Map<string, number>();
-
 	for (const player of players) cells.set(player.cell, player.playerId);
+
+	const scores = new Map<string, number>();
 
 	let maxScore = 0;
 	let maxPlayerId = undefined;
@@ -117,8 +117,10 @@ function calculateScores(players: PlayerDto[], boxes: Cell[][]) {
 	for (const row of boxes) {
 		for (const cell of row) {
 			if (cell === Cell.Empty) continue;
+
 			const playerId = cells.get(cell);
 			if (!playerId) continue;
+
 			const score = (scores.get(playerId) || 0) + 1;
 			scores.set(playerId, score);
 
@@ -156,30 +158,39 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 	}, [room.board.boxes]);
 
 	return (
-		<div className="absolute top-1/2 left-1/2 flex w-fit translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6">
-			<div className="flex w-full items-center justify-between">
+		<div className="absolute top-1/2 left-1/2 flex w-1/2 w-fit min-w-[95%] max-w-[800px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6 overflow-y-auto lg:min-w-[400px]">
+			<motion.div
+				className="flex w-full items-center justify-between"
+				layout
+				transition={{ type: "spring", damping: 25, stiffness: 120 }}
+			>
 				<LogoIcon flat />
 				<div className="flex gap-2">
 					<ThemeSwitcher />
 					<Settings player={player!} mutatePlayer={mutatePlayer} />
 				</div>
-			</div>
-			<Board
-				width={room.board.boxes[0].length}
-				height={room.board.boxes.length}
-				board={room.board}
-				players={room.players}
-				player={player}
-				turnId={room.turnId}
-				mutateRoom={mutateRoom}
-			/>
+			</motion.div>
+			<motion.div
+				layout
+				transition={{ type: "spring", damping: 25, stiffness: 120 }}
+				className="w-full"
+			>
+				<Board
+					width={room.board.boxes[0].length}
+					height={room.board.boxes.length}
+					board={room.board}
+					players={room.players}
+					player={player}
+					turnId={room.turnId}
+					mutateRoom={mutateRoom}
+				/>
+			</motion.div>
 			{!room.started && (
 				<div className="flex w-full flex-row gap-2">
 					<Button
 						className="grow"
 						disabled={!canStart}
 						onClick={() => {
-							console.log(canStart);
 							if (!canStart) return;
 							mutateRoom({ started: true });
 						}}
@@ -202,8 +213,12 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 							player={player}
 							score={scores.get(player.playerId) ?? 0}
 							winner={index === 0}
-							isTurn={room.started && room.turnId === player.playerId}
-							layout
+							isTurn={
+								room.started &&
+								!gameFinishsed &&
+								room.turnId === player.playerId
+							}
+							layout="position"
 							transition={{ type: "spring", damping: 25, stiffness: 120 }}
 						/>
 					))}

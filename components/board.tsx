@@ -1,12 +1,7 @@
 "use client";
 
-import {
-	motion,
-	useAnimation,
-	useMotionTemplate,
-	useMotionValue,
-} from "framer-motion";
-import { Fragment, useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Fragment } from "react";
 import type { RoomDto } from "~/app/room/[id]/room";
 import { cn } from "~/lib/utils";
 import { Cell } from "../lib/board";
@@ -104,9 +99,9 @@ export function Board({
 
 	return (
 		<div
-			className="grid"
+			className="grid w-full overflow-visible"
 			style={{
-				gridTemplateColumns: `repeat(${width}, 12px minmax(0, 93px)) 12px`,
+				gridTemplateColumns: `repeat(${width}, 12px 1fr) 12px`,
 			}}
 		>
 			{board.horizontals.map((row, y) => (

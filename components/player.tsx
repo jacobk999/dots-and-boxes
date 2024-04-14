@@ -1,3 +1,6 @@
+"use client";
+
+import { AnimatePresence, cubicBezier, motion } from "framer-motion";
 import { forwardRef } from "react";
 import { cn } from "~/lib/utils";
 import { Cell } from "../lib/board";
@@ -20,33 +23,54 @@ interface PlayerCardProps {
 export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
 	({ player, score, winner = false, isTurn = false }, ref) => {
 		return (
-			<div
-				ref={ref}
-				className={cn(
-					"flex w-full flex-row rounded-md",
-					PlayerCardBackground[player.cell],
-					isTurn && "animate-bounce",
-				)}
-			>
-				<div
+			<div ref={ref} className={cn("flex w-full flex-row")}>
+				<motion.div
 					className={cn(
-						"flex grow flex-row items-center gap-1.5 rounded-r-lg rounded-l-md px-3 py-2",
-						PlayerNametagBackground[player.cell],
+						"flex grow flex-row rounded-md",
+						PlayerCardBackground[player.cell],
 					)}
+					variants={{
+						initial: { y: "0rem" },
+						bouncing: {
+							y: ["0rem", "-0.5rem", "0rem"],
+							transition: {
+								repeat: Number.POSITIVE_INFINITY,
+								duration: 1,
+								ease: cubicBezier(0.72, 1.48, 0.83, 1.12),
+							},
+						},
+					}}
+					animate={isTurn ? "bouncing" : "initial"}
 				>
-					<div className="relative flex h-8 w-8 items-center justify-center rounded-[50px] bg-white/30 text-xl dark:bg-black/30">
-						{winner && (
-							<div className="absolute top-[-10px] text-yellow-500">
-								<CrownIcon filled />
-							</div>
+					<div
+						className={cn(
+							"flex grow flex-row items-center gap-1.5 rounded-r-lg rounded-l-md px-3 py-2",
+							PlayerNametagBackground[player.cell],
 						)}
-						{player.emoji}
+					>
+						<div className="relative flex h-8 w-8 items-center justify-center rounded-[50px] bg-white/30 text-xl dark:bg-black/30">
+							<AnimatePresence>
+								{winner && (
+									<motion.div
+										className="absolute text-yellow-500"
+										initial={{ opacity: 0, scale: 0, y: 0 }}
+										animate={{ opacity: 1, scale: 1, y: -17 }}
+										exit={{ opacity: 0, scale: 0, y: 0 }}
+										transition={{ type: "spring", duration: 0.5, delay: 0.3 }}
+									>
+										<CrownIcon filled />
+									</motion.div>
+								)}
+							</AnimatePresence>
+
+							{player.emoji}
+						</div>
+						<p className="font-semibold">{player.username}</p>
 					</div>
-					<p className="font-semibold">{player.username}</p>
-				</div>
-				<div className="flex w-10 items-center justify-center font-extrabold">
-					<p>{score}</p>
-				</div>
+					<div className="flex w-10 items-center justify-center font-extrabold">
+						<p>{score}</p>
+					</div>
+				</motion.div>
 			</div>
 		);
 	},
