@@ -22,6 +22,7 @@ interface BoardProps {
 	player?: PlayerDto;
 	turnId: string;
 	mutateRoom: (room: Partial<RoomDto>) => void;
+	started: boolean;
 }
 
 export function Board({
@@ -31,6 +32,7 @@ export function Board({
 	player,
 	turnId,
 	mutateRoom,
+	started,
 }: BoardProps) {
 	const turn = players.findIndex((p) => p.playerId === turnId);
 
@@ -49,7 +51,7 @@ export function Board({
 	}
 
 	function setLine(x: number, y: number, orientation: Orientation) {
-		if (players[turn].playerId !== player?.playerId) return;
+		if (!started || players[turn].playerId !== player?.playerId) return;
 
 		let hasCompletedBox = false;
 		const cell = player?.cell!;
@@ -99,7 +101,7 @@ export function Board({
 
 	return (
 		<div
-			className="grid w-full overflow-visible"
+			className="grid w-full"
 			style={{
 				gridTemplateColumns: `repeat(${width}, 12px 1fr) 12px`,
 			}}
@@ -117,6 +119,7 @@ export function Board({
 									board.lastMove?.y === y &&
 									board.lastMove?.orientation === Orientation.Horizontal
 								}
+								disabled={!started}
 							/>
 							<Dot />
 						</Fragment>
@@ -131,6 +134,7 @@ export function Board({
 									board.lastMove?.y === y &&
 									board.lastMove?.orientation === Orientation.Vertical
 								}
+								disabled={!started}
 							/>
 							{board.boxes[y]?.[x] !== undefined && (
 								<Box value={board.boxes[y][x]} />
@@ -192,10 +196,12 @@ function Line({
 	value,
 	lastMove,
 	setLine,
+	disabled,
 }: {
 	value: Cell;
 	lastMove?: boolean;
 	setLine: () => void;
+	disabled?: boolean;
 }) {
 	const color = PlayerColor[value];
 
@@ -221,6 +227,7 @@ function Line({
 				duration: 0.45,
 			}}
 			onClick={() => setLine()}
+			disabled={disabled}
 		>
 			<span className="sr-only">Line - {value}</span>
 		</motion.button>

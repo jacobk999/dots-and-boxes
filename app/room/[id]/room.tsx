@@ -11,6 +11,7 @@ import { ThemeSwitcher } from "~/components/theme-switcher";
 import { Button } from "~/components/ui/button";
 import {
 	Modal,
+	ModalClose,
 	ModalContent,
 	ModalFooter,
 	ModalHeader,
@@ -39,8 +40,12 @@ function useRoom(initialRoom: RoomDto) {
 
 	// Subscribe to changes from Supabase
 	useEffect(() => {
+		const playerId = sessionStorage.getItem(initialRoom.roomId)!;
+
 		const channel = supabase
-			.channel(`room:${initialRoom.roomId}`)
+			.channel(`room:${initialRoom.roomId}`, {
+				config: { presence: { key: playerId } },
+			})
 			.on(
 				"postgres_changes",
 				{
@@ -53,7 +58,18 @@ function useRoom(initialRoom: RoomDto) {
 					setRoom(payload.new as RoomDto);
 				},
 			)
-			.subscribe();
+			.on("presence", { event: "join" }, ({ key }) => {
+				console.log("Player joined", key);
+			})
+			.on("presence", { event: "leave" }, ({ key }) => {
+				console.log("Player left", key);
+			})
+			.subscribe(async (status) => {
+				if (status !== "SUBSCRIBED") return;
+				if (!playerId) return;
+
+				await channel.track({ id: playerId });
+			});
 
 		return () => {
 			supabase.removeChannel(channel);
@@ -158,7 +174,7 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 	}, [room.board.boxes]);
 
 	return (
-		<div className="absolute top-1/2 left-1/2 flex w-1/2 w-fit min-w-[95%] max-w-[800px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6 overflow-y-auto lg:min-w-[400px]">
+		<div className="absolute top-1/2 left-1/2 flex w-fit min-w-[95%] max-w-[800px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6 lg:min-w-[400px]">
 			<motion.div
 				className="flex w-full items-center justify-between"
 				layout
@@ -183,24 +199,39 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 					player={player}
 					turnId={room.turnId}
 					mutateRoom={mutateRoom}
+					started={room.started}
 				/>
 			</motion.div>
-			{!room.started && (
-				<div className="flex w-full flex-row gap-2">
-					<Button
-						className="grow"
-						disabled={!canStart}
-						onClick={() => {
-							if (!canStart) return;
-							mutateRoom({ started: true });
-						}}
+			<AnimatePresence mode="popLayout">
+				{(!room.started || gameFinishsed) && (
+					<motion.div
+						className="flex w-full flex-row gap-2"
+						initial={{ opacity: 0, scale: 0 }}
+						animate={{ opacity: 1, scale: 1 }}
+						exit={{ opacity: 0, scale: 0 }}
+						transition={{ type: "spring", duration: 0.2 }}
 					>
-						Start Game
-					</Button>
-					<ShareButton link={`/?room=${initialRoom.roomName}`} />
-				</div>
-			)}
-
+						<Button
+							className="grow"
+							disabled={!canStart}
+							onClick={() => {
+								if (!canStart) return;
+								mutateRoom({
+									started: true,
+									turnId: room.ownerId,
+									board: createBoard(
+										room.board.boxes[0].length,
+										room.board.boxes.length,
+									),
+								});
+							}}
+						>
+							Start Game
+						</Button>
+						<ShareButton link={`/?room=${initialRoom.roomName}`} />
+					</motion.div>
+				)}
+			</AnimatePresence>
 			<div className="grid w-full grid-cols-2 gap-3">
 				{[...room.players]
 					.sort(
@@ -223,14 +254,16 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 						/>
 					))}
 			</div>
-			<GameFinishedModal
-				open={gameFinishsed}
-				room={room}
-				mutateRoom={mutateRoom}
-				player={player}
-				scores={scores}
-				winnerId={winnerId!}
-			/>
+			{gameFinishsed && (
+				<GameFinishedModal
+					open={gameFinishsed}
+					room={room}
+					mutateRoom={mutateRoom}
+					player={player}
+					scores={scores}
+					winnerId={winnerId!}
+				/>
+			)}
 		</div>
 	);
 }
@@ -253,7 +286,7 @@ function GameFinishedModal({
 	const isWinner = winnerId === player?.playerId;
 
 	return (
-		<Modal open={open}>
+		<Modal defaultOpen>
 			<ModalPortal>
 				<ModalContent className="flex flex-col gap-6">
 					<ModalHeader>
@@ -275,22 +308,11 @@ function GameFinishedModal({
 							))}
 					</div>
 					<ModalFooter>
-						<Button
-							className="w-full"
-							variant="default"
-							onClick={() => {
-								mutateRoom({
-									board: createBoard(
-										room.board.boxes[0].length,
-										room.board.boxes.length,
-									),
-									turnId: room.ownerId,
-									started: false,
-								});
-							}}
-						>
-							Play Again
-						</Button>
+						<ModalClose asChild>
+							<Button className="w-full" variant="default">
+								Play Again
+							</Button>
+						</ModalClose>
 					</ModalFooter>
 				</ModalContent>
 				<Confetti />
