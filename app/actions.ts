@@ -36,6 +36,7 @@ export async function createRoom({
 				username,
 				emoji: randomEmoji(),
 				cell: Cell.Player1,
+				online: true,
 			},
 		],
 
@@ -79,7 +80,14 @@ export async function joinRoom({
 
 	const playerId = randomUUID();
 	const cell = Cell[`Player${players.length + 1}` as keyof typeof Cell];
-	players.push({ playerId, username, emoji: randomEmoji(), cell });
+
+	players.push({
+		playerId,
+		username,
+		emoji: randomEmoji(),
+		cell,
+		online: true,
+	});
 
 	await supabase
 		.from("rooms")
