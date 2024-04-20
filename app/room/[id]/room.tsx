@@ -59,10 +59,20 @@ function useRoom(initialRoom: RoomDto) {
 				},
 			)
 			.on("presence", { event: "join" }, ({ key }) => {
-				console.log("Player joined", key);
+				setRoom((room) => ({
+					...room,
+					players: room.players.map((p) =>
+						p.playerId === key ? { ...p, online: true } : p,
+					),
+				}));
 			})
 			.on("presence", { event: "leave" }, ({ key }) => {
-				console.log("Player left", key);
+				setRoom((room) => ({
+					...room,
+					players: room.players.map((p) =>
+						p.playerId === key ? { ...p, online: false } : p,
+					),
+				}));
 			})
 			.subscribe(async (status) => {
 				if (status !== "SUBSCRIBED") return;
@@ -87,12 +97,10 @@ function useRoom(initialRoom: RoomDto) {
 
 		update();
 	}, [edited, room]);
-
 	function mutateRoom(newRoom: Partial<RoomDto>) {
 		setRoom({ ...room, ...newRoom });
 		setEdited(true);
 	}
-
 	return { room, mutateRoom };
 }
 

@@ -11,6 +11,7 @@ export interface PlayerDto {
 	username: string;
 	emoji: string;
 	cell: Cell;
+	online: boolean;
 }
 
 interface PlayerCardProps {
@@ -23,7 +24,13 @@ interface PlayerCardProps {
 export const PlayerCard = forwardRef<HTMLDivElement, PlayerCardProps>(
 	({ player, score, winner = false, isTurn = false }, ref) => {
 		return (
-			<div ref={ref} className={cn("flex w-full flex-row")}>
+			<div
+				ref={ref}
+				className={cn(
+					"flex w-full flex-row transition-opacity",
+					!player.online && "opacity-50",
+				)}
+			>
 				<motion.div
 					className={cn(
 						"flex grow flex-row rounded-md",
