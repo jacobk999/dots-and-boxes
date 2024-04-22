@@ -22,6 +22,7 @@ import {
 	Modal,
 	ModalContent,
 	ModalDescription,
+	ModalFooter,
 	ModalHeader,
 	ModalTitle,
 	ModalTrigger,
@@ -103,14 +104,11 @@ export function Settings({ player, mutatePlayer }: SettingsProps) {
 								</FormItem>
 							)}
 						/>
-						<div className="flex w-full gap-3">
-							<Button variant="destructive" className="w-full">
-								Leave Room
-							</Button>
+						<ModalFooter>
 							<Button className="w-full" type="submit">
 								Save Changes
 							</Button>
-						</div>
+						</ModalFooter>
 					</form>
 				</Form>
 			</ModalContent>
