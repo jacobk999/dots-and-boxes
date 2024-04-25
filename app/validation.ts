@@ -3,7 +3,7 @@ import { z } from "zod";
 export const SIZE_DEFAULT = 5;
 
 export const RoomNameSchema = z.string().min(3).max(16);
-export const UsernameSchema = z.string().min(3).max(8);
+export const UsernameSchema = z.string().min(3).max(12);
 export const SizeSchema = z.coerce.number().min(3).max(11);
 
 export const CreateGameSchema = z.object({
