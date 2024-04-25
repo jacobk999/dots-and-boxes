@@ -171,7 +171,7 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 		[room.board.boxes, room.players],
 	);
 
-	const gameFinishsed = useMemo(() => {
+	const gameFinished = useMemo(() => {
 		for (const row of room.board.boxes) {
 			for (const cell of row) {
 				if (cell === Cell.Empty) return false;
@@ -182,7 +182,7 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 	}, [room.board.boxes]);
 
 	return (
-		<div className="absolute top-1/2 left-1/2 flex w-fit min-w-[95%] max-w-[800px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6 lg:min-w-[400px]">
+		<div className="absolute top-1/2 left-1/2 flex w-fit min-w-[95%] max-w-[800px] translate-x-[-50%] translate-y-[-50%] flex-col items-center gap-6 md:min-w-[45%] lg:max-w-[100px]">
 			<motion.div
 				className="flex w-full items-center justify-between"
 				layout
@@ -211,7 +211,7 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 				/>
 			</motion.div>
 			<AnimatePresence mode="popLayout">
-				{(!room.started || gameFinishsed) && (
+				{(!room.started || gameFinished) && (
 					<motion.div
 						className="flex w-full flex-row gap-2"
 						initial={{ opacity: 0, scale: 0 }}
@@ -253,18 +253,16 @@ export function Room({ initialRoom }: { initialRoom: RoomDto }) {
 							score={scores.get(player.playerId) ?? 0}
 							winner={index === 0}
 							isTurn={
-								room.started &&
-								!gameFinishsed &&
-								room.turnId === player.playerId
+								room.started && !gameFinished && room.turnId === player.playerId
 							}
 							layout="position"
 							transition={{ type: "spring", damping: 25, stiffness: 120 }}
 						/>
 					))}
 			</div>
-			{gameFinishsed && (
+			{gameFinished && (
 				<GameFinishedModal
-					open={gameFinishsed}
+					open={gameFinished}
 					room={room}
 					mutateRoom={mutateRoom}
 					player={player}
