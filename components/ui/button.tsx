@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import { type ComponentProps, type ElementRef, forwardRef } from "react";
 import { cn } from "~/lib/utils";
 
 const ButtonVariant = {
@@ -25,21 +25,19 @@ export interface ButtonProps extends ComponentProps<"button"> {
 	size?: keyof typeof ButtonSize;
 }
 
-export function Button({
-	className,
-	variant = "default",
-	size = "default",
-	...props
-}: ButtonProps) {
-	return (
-		<button
-			className={cn(
-				"inline-flex items-center justify-center whitespace-nowrap rounded-md font-bold text-sm ring-offset-background transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-				ButtonVariant[variant],
-				ButtonSize[size],
-				className,
-			)}
-			{...props}
-		/>
-	);
-}
+export const Button = forwardRef<ElementRef<"button">, ButtonProps>(
+	({ className, variant = "default", size = "default", ...props }, ref) => {
+		return (
+			<button
+				ref={ref}
+				className={cn(
+					"inline-flex items-center justify-center whitespace-nowrap rounded-md font-bold text-sm ring-offset-background transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+					ButtonVariant[variant],
+					ButtonSize[size],
+					className,
+				)}
+				{...props}
+			/>
+		);
+	},
+);
