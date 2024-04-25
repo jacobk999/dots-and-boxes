@@ -64,7 +64,7 @@ function HomePageTabs() {
 			onValueChange={setTab}
 			className="w-full"
 		>
-			<TabsList className="w-full">
+			<TabsList>
 				<TabsTrigger value="create">
 					<PlusIcon filled={tab === "create"} />
 					Create
