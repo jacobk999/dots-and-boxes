@@ -23,9 +23,9 @@
 		"@radix-ui/react-select": "^2.1.1",
 		"@radix-ui/react-slot": "^1.1.0",
 		"@radix-ui/react-tabs": "^1.1.0",
-		"@supabase/supabase-js": "^2.43.5",
+		"@supabase/supabase-js": "^2.44.2",
 		"clsx": "^2.1.1",
-		"framer-motion": "^11.2.11",
+		"framer-motion": "^11.2.12",
 		"next": "14.2.4",
 		"next-themes": "^0.3.0",
 		"react": "^18.3.1",
@@ -39,13 +39,13 @@
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "1.8.2",
-		"@types/node": "^20.14.8",
+		"@biomejs/biome": "1.8.3",
+		"@types/node": "^20.14.9",
 		"@types/react": "^18.3.3",
 		"@types/react-dom": "^18.3.0",
 		"autoprefixer": "^10.4.19",
 		"lefthook": "^1.6.18",
-		"postcss": "^8.4.38",
+		"postcss": "^8.4.39",
 		"tailwindcss": "^3.4.4",
 		"typescript": "^5.5.2"
 	},
