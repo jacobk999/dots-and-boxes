@@ -1,6 +1,6 @@
 # Dots and Boxes
 
-https://github.com/jacobk999/dots-and-boxes/raw/refs/heads/main/examples/demo.mp4
+https://github.com/user-attachments/assets/42fc2efe-0a00-49db-b76e-ee8cfd64e15a
 
 ## Tech Stack
 - TypeScript
