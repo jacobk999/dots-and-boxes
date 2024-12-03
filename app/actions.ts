@@ -52,6 +52,7 @@ export async function createRoom({
 			return { error: Errors.ROOM_NAME_TAKEN };
 		}
 
+		console.error(error);
 		return { error: Errors.SUPABASE_ERROR };
 	}
 
