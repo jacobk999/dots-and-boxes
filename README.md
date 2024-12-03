@@ -1,5 +1,7 @@
 # Dots and Boxes
 
+https://github.com/jacobk999/dots-and-boxes/raw/refs/heads/main/examples/demo.mp4
+
 ## Tech Stack
 - TypeScript
 - Next.js + React
